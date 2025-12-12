@@ -14,7 +14,241 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      compromissos: {
+        Row: {
+          cliente: string
+          created_at: string | null
+          data: string
+          endereco: string | null
+          hora: string
+          id: string
+          imovel: string | null
+          lead_id: string | null
+          status: string | null
+          tipo: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          cliente: string
+          created_at?: string | null
+          data: string
+          endereco?: string | null
+          hora: string
+          id?: string
+          imovel?: string | null
+          lead_id?: string | null
+          status?: string | null
+          tipo: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          cliente?: string
+          created_at?: string | null
+          data?: string
+          endereco?: string | null
+          hora?: string
+          id?: string
+          imovel?: string | null
+          lead_id?: string | null
+          status?: string | null
+          tipo?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compromissos_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      imoveis: {
+        Row: {
+          area: number | null
+          bairro: string | null
+          baixou_preco: boolean | null
+          cidade: string | null
+          created_at: string | null
+          foto: string | null
+          id: string
+          novo: boolean | null
+          preco: number
+          quartos: number | null
+          tipo: string
+          titulo: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          area?: number | null
+          bairro?: string | null
+          baixou_preco?: boolean | null
+          cidade?: string | null
+          created_at?: string | null
+          foto?: string | null
+          id?: string
+          novo?: boolean | null
+          preco: number
+          quartos?: number | null
+          tipo: string
+          titulo: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          area?: number | null
+          bairro?: string | null
+          baixou_preco?: boolean | null
+          cidade?: string | null
+          created_at?: string | null
+          foto?: string | null
+          id?: string
+          novo?: boolean | null
+          preco?: number
+          quartos?: number | null
+          tipo?: string
+          titulo?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      interacoes: {
+        Row: {
+          created_at: string | null
+          descricao: string | null
+          id: string
+          lead_id: string
+          tipo: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          lead_id: string
+          tipo: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          lead_id?: string
+          tipo?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interacoes_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          avatar: string | null
+          bairros: string[] | null
+          created_at: string | null
+          email: string | null
+          faixa_preco: string | null
+          id: string
+          interesse: string | null
+          nome: string
+          status: string | null
+          telefone: string | null
+          ultimo_contato: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          avatar?: string | null
+          bairros?: string[] | null
+          created_at?: string | null
+          email?: string | null
+          faixa_preco?: string | null
+          id?: string
+          interesse?: string | null
+          nome: string
+          status?: string | null
+          telefone?: string | null
+          ultimo_contato?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          avatar?: string | null
+          bairros?: string[] | null
+          created_at?: string | null
+          email?: string | null
+          faixa_preco?: string | null
+          id?: string
+          interesse?: string | null
+          nome?: string
+          status?: string | null
+          telefone?: string | null
+          ultimo_contato?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar: string | null
+          cargo: string | null
+          comissoes: number | null
+          created_at: string | null
+          email: string
+          id: string
+          meta: number | null
+          nome: string
+          ranking: number | null
+          taxa_conversao: number | null
+          tempo_medio_fechamento: number | null
+          updated_at: string | null
+          vendas: number | null
+        }
+        Insert: {
+          avatar?: string | null
+          cargo?: string | null
+          comissoes?: number | null
+          created_at?: string | null
+          email: string
+          id: string
+          meta?: number | null
+          nome: string
+          ranking?: number | null
+          taxa_conversao?: number | null
+          tempo_medio_fechamento?: number | null
+          updated_at?: string | null
+          vendas?: number | null
+        }
+        Update: {
+          avatar?: string | null
+          cargo?: string | null
+          comissoes?: number | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          meta?: number | null
+          nome?: string
+          ranking?: number | null
+          taxa_conversao?: number | null
+          tempo_medio_fechamento?: number | null
+          updated_at?: string | null
+          vendas?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
