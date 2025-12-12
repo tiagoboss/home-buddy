@@ -104,6 +104,13 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
     overscroll-behavior: none;
   }
+
+  /* Theme transition */
+  *,
+  *::before,
+  *::after {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.15s ease, box-shadow 0.3s ease;
+  }
 }
 
 @layer utilities {
