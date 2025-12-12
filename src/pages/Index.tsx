@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { TabBar } from '@/components/layout/TabBar';
 import { QuickActionsSheet } from '@/components/sheets/QuickActionsSheet';
+import { DeviceFrame } from '@/components/layout/DeviceFrame';
+import { StatusBar } from '@/components/layout/StatusBar';
+import { HomeIndicator } from '@/components/layout/HomeIndicator';
 import { HomePage } from '@/pages/HomePage';
 import { LeadsPage } from '@/pages/LeadsPage';
 import { AgendaPage } from '@/pages/AgendaPage';
@@ -27,20 +30,28 @@ const Index = () => {
   };
   
   return (
-    <div className="max-w-lg mx-auto bg-background min-h-screen relative">
-      {renderContent()}
-      
-      <TabBar 
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        onNewAction={() => setIsQuickActionsOpen(true)}
-      />
-      
-      <QuickActionsSheet 
-        isOpen={isQuickActionsOpen}
-        onClose={() => setIsQuickActionsOpen(false)}
-      />
-    </div>
+    <DeviceFrame>
+      <div className="bg-background h-full relative overflow-y-auto">
+        <StatusBar />
+        
+        <div className="pt-[44px] pb-[100px] animate-fade-in">
+          {renderContent()}
+        </div>
+        
+        <TabBar 
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          onNewAction={() => setIsQuickActionsOpen(true)}
+        />
+        
+        <HomeIndicator />
+        
+        <QuickActionsSheet 
+          isOpen={isQuickActionsOpen}
+          onClose={() => setIsQuickActionsOpen(false)}
+        />
+      </div>
+    </DeviceFrame>
   );
 };
 
