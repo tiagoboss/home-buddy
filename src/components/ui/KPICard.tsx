@@ -7,11 +7,15 @@ interface KPICardProps {
   label: string;
   trend?: 'up' | 'down' | 'neutral';
   iconColor?: string;
+  onClick?: () => void;
 }
 
-export const KPICard = ({ icon: Icon, value, label, trend, iconColor }: KPICardProps) => {
+export const KPICard = ({ icon: Icon, value, label, trend, iconColor, onClick }: KPICardProps) => {
   return (
-    <div className="flex-shrink-0 w-[100px] ios-card p-3 animate-scale-press snap-start">
+    <div 
+      className="flex-shrink-0 w-[100px] ios-card p-3 animate-scale-press snap-start cursor-pointer active:scale-95 transition-transform"
+      onClick={onClick}
+    >
       <div className={cn(
         "w-7 h-7 rounded-lg flex items-center justify-center mb-2",
         iconColor || "bg-primary/10"
