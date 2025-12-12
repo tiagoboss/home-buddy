@@ -72,30 +72,66 @@ export const PerfilPage = () => {
         </div>
       </section>
       
-      {/* Mini Chart Placeholder */}
+      {/* Evolution Chart - Last 6 months */}
       <section className="px-4 mb-6">
         <div className="ios-card p-4">
-          <h3 className="text-sm font-medium text-muted-foreground mb-3">Evolução - Últimos 6 meses</h3>
-          <div className="flex items-end gap-2 h-20">
-            {[40, 65, 55, 80, 70, 90].map((height, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                <div 
-                  className="w-full bg-primary/20 rounded-t-sm transition-all duration-500"
-                  style={{ 
-                    height: `${height}%`,
-                    animationDelay: `${i * 100}ms`
-                  }}
-                >
-                  <div 
-                    className="w-full bg-primary rounded-t-sm transition-all duration-700"
-                    style={{ height: `${height}%` }}
-                  />
+          <h3 className="text-sm font-semibold text-foreground mb-4">Evolução - Últimos 6 meses</h3>
+          
+          {/* Chart */}
+          <div className="flex items-end gap-2 h-24 mb-4">
+            {[
+              { month: 'Jul', vendas: 3, meta: 5 },
+              { month: 'Ago', vendas: 4, meta: 5 },
+              { month: 'Set', vendas: 3, meta: 5 },
+              { month: 'Out', vendas: 5, meta: 5 },
+              { month: 'Nov', vendas: 4, meta: 5 },
+              { month: 'Dez', vendas: 4, meta: 5 },
+            ].map((data, i) => {
+              const percentage = (data.vendas / data.meta) * 100;
+              const isCurrentMonth = i === 5;
+              return (
+                <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
+                  <span className="text-[10px] font-medium text-foreground">{data.vendas}</span>
+                  <div className="w-full h-16 bg-muted/50 rounded-lg relative overflow-hidden">
+                    <div 
+                      className={cn(
+                        "absolute bottom-0 w-full rounded-lg transition-all duration-700",
+                        percentage >= 100 ? "bg-success" : percentage >= 80 ? "bg-warning" : "bg-primary"
+                      )}
+                      style={{ 
+                        height: `${Math.min(percentage, 100)}%`,
+                        animationDelay: `${i * 100}ms`
+                      }}
+                    />
+                    {isCurrentMonth && (
+                      <div className="absolute inset-0 bg-primary/20 animate-pulse" />
+                    )}
+                  </div>
+                  <span className={cn(
+                    "text-[10px]",
+                    isCurrentMonth ? "font-semibold text-foreground" : "text-muted-foreground"
+                  )}>
+                    {data.month}
+                  </span>
                 </div>
-                <span className="text-[10px] text-muted-foreground">
-                  {['Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'][i]}
-                </span>
-              </div>
-            ))}
+              );
+            })}
+          </div>
+          
+          {/* Summary Stats */}
+          <div className="grid grid-cols-3 gap-3 pt-3 border-t border-border">
+            <div className="text-center">
+              <p className="text-lg font-bold text-foreground">23</p>
+              <p className="text-[10px] text-muted-foreground">Vendas totais</p>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-bold text-success">R$ 184k</p>
+              <p className="text-[10px] text-muted-foreground">Comissões</p>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-bold text-foreground">78</p>
+              <p className="text-[10px] text-muted-foreground">Leads atendidos</p>
+            </div>
           </div>
         </div>
       </section>
