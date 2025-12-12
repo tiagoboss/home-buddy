@@ -15,10 +15,10 @@ export const HomePage = () => {
     <div className="min-h-screen bg-background content-safe">
       <Header />
       
-      <main className="px-4 py-4 space-y-5">
+      <main className="py-4 space-y-5">
         {/* KPIs */}
-        <section>
-          <div className="flex gap-2.5 overflow-x-auto pb-2 hide-scrollbar snap-x-mandatory -mx-4 px-4">
+        <section className="px-4">
+          <div className="flex gap-2.5 overflow-x-auto pb-2 hide-scrollbar snap-x-mandatory scroll-pl-0 -mr-4 pr-4">
             <KPICard 
               icon={DollarSign} 
               value={corretor.vendas} 
@@ -46,7 +46,7 @@ export const HomePage = () => {
         </section>
         
         {/* Progress */}
-        <section>
+        <section className="px-4">
           <ProgressBar 
             current={corretor.vendas} 
             total={corretor.meta}
@@ -55,7 +55,7 @@ export const HomePage = () => {
         </section>
         
         {/* Próximos Compromissos */}
-        <section>
+        <section className="px-4">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Próximos Compromissos</h2>
             <button className="flex items-center gap-0.5 text-xs text-primary font-medium animate-scale-press">
@@ -71,7 +71,7 @@ export const HomePage = () => {
         </section>
         
         {/* Leads Quentes */}
-        <section>
+        <section className="px-4">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Leads Quentes</h2>
             <button className="flex items-center gap-0.5 text-xs text-primary font-medium animate-scale-press">
@@ -79,7 +79,7 @@ export const HomePage = () => {
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
-          <div className="flex gap-2.5 overflow-x-auto pb-2 hide-scrollbar snap-x-mandatory -mx-4 px-4">
+          <div className="flex gap-2.5 overflow-x-auto pb-2 hide-scrollbar snap-x-mandatory scroll-pl-0 -mr-4 pr-4">
             {hotLeads.map((lead) => (
               <LeadCard key={lead.id} lead={lead} compact />
             ))}
@@ -87,7 +87,7 @@ export const HomePage = () => {
         </section>
         
         {/* Imóveis em Destaque */}
-        <section>
+        <section className="px-4">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Imóveis em Destaque</h2>
             <button className="flex items-center gap-0.5 text-xs text-primary font-medium animate-scale-press">
@@ -95,7 +95,7 @@ export const HomePage = () => {
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
-          <div className="flex gap-2.5 overflow-x-auto pb-2 hide-scrollbar snap-x-mandatory -mx-4 px-4">
+          <div className="flex gap-2.5 overflow-x-auto pb-2 hide-scrollbar snap-x-mandatory scroll-pl-0 -mr-4 pr-4">
             {imoveis.map((imovel) => (
               <ImovelCard key={imovel.id} imovel={imovel} />
             ))}
