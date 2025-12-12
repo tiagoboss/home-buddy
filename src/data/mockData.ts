@@ -2,7 +2,7 @@ import { Corretor, Lead, Compromisso, Imovel } from '@/types';
 
 export const corretor: Corretor = {
   id: "1",
-  nome: "João Silva",
+  nome: "Larbase",
   email: "joao@larbase.com",
   cargo: "Corretor Senior",
   ranking: 2,
