@@ -1,22 +1,32 @@
 import { FileText, Calendar, Camera, ClipboardList, Phone, MapPin, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+export type QuickActionType = 'lead' | 'visita' | 'imovel' | 'proposta' | 'ligacao' | 'checkin' | null;
+
 interface QuickActionsSheetProps {
   isOpen: boolean;
   onClose: () => void;
+  onActionSelect?: (action: QuickActionType) => void;
 }
 
-const actions = [
-  { icon: FileText, label: 'Registrar Lead', color: 'bg-info' },
-  { icon: Calendar, label: 'Agendar Visita', color: 'bg-success' },
-  { icon: Camera, label: 'Capturar Imóvel', color: 'bg-warning' },
-  { icon: ClipboardList, label: 'Nova Proposta', color: 'bg-secondary', iconColor: 'text-muted-foreground' },
-  { icon: Phone, label: 'Registrar Ligação', color: 'bg-muted', iconColor: 'text-muted-foreground' },
-  { icon: MapPin, label: 'Check-in Visita', color: 'bg-destructive' },
+const actions: { icon: typeof FileText; label: string; color: string; iconColor?: string; action: QuickActionType }[] = [
+  { icon: FileText, label: 'Registrar Lead', color: 'bg-info', action: 'lead' },
+  { icon: Calendar, label: 'Agendar Visita', color: 'bg-success', action: 'visita' },
+  { icon: Camera, label: 'Capturar Imóvel', color: 'bg-warning', action: 'imovel' },
+  { icon: ClipboardList, label: 'Nova Proposta', color: 'bg-secondary', iconColor: 'text-muted-foreground', action: 'proposta' },
+  { icon: Phone, label: 'Registrar Ligação', color: 'bg-muted', iconColor: 'text-muted-foreground', action: 'ligacao' },
+  { icon: MapPin, label: 'Check-in Visita', color: 'bg-destructive', action: 'checkin' },
 ];
 
-export const QuickActionsSheet = ({ isOpen, onClose }: QuickActionsSheetProps) => {
+export const QuickActionsSheet = ({ isOpen, onClose, onActionSelect }: QuickActionsSheetProps) => {
   if (!isOpen) return null;
+
+  const handleAction = (action: QuickActionType) => {
+    onClose();
+    if (onActionSelect) {
+      onActionSelect(action);
+    }
+  };
   
   return (
     <>
@@ -50,7 +60,7 @@ export const QuickActionsSheet = ({ isOpen, onClose }: QuickActionsSheetProps) =
             {actions.map((action) => (
               <button
                 key={action.label}
-                onClick={onClose}
+                onClick={() => handleAction(action.action)}
                 className="flex flex-col items-center gap-2 py-4 rounded-xl bg-secondary/50 animate-scale-press hover:bg-secondary transition-colors"
               >
                 <div className={cn(

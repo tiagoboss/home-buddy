@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TabBar } from '@/components/layout/TabBar';
-import { QuickActionsSheet } from '@/components/sheets/QuickActionsSheet';
+import { QuickActionsSheet, QuickActionType } from '@/components/sheets/QuickActionsSheet';
 import { DeviceFrame } from '@/components/layout/DeviceFrame';
 import { StatusBar } from '@/components/layout/StatusBar';
 import { HomeIndicator } from '@/components/layout/HomeIndicator';
@@ -10,21 +10,39 @@ import { HomePage } from '@/pages/HomePage';
 import { LeadsPage } from '@/pages/LeadsPage';
 import { AgendaPage } from '@/pages/AgendaPage';
 import { PerfilPage } from '@/pages/PerfilPage';
+import { LeadForm } from '@/components/forms/LeadForm';
+import { VisitaForm } from '@/components/forms/VisitaForm';
+import { ImovelForm } from '@/components/forms/ImovelForm';
+import { LigacaoForm } from '@/components/forms/LigacaoForm';
 import { TabType } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
+  const [activeForm, setActiveForm] = useState<QuickActionType>(null);
 
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth');
     }
   }, [user, loading, navigate]);
+
+  const handleActionSelect = (action: QuickActionType) => {
+    if (action === 'proposta') {
+      toast.info('Nova Proposta em breve!');
+      return;
+    }
+    if (action === 'checkin') {
+      toast.info('Check-in de Visita em breve!');
+      return;
+    }
+    setActiveForm(action);
+  };
 
   if (loading) {
     return (
@@ -91,6 +109,25 @@ const Index = () => {
         <QuickActionsSheet 
           isOpen={isQuickActionsOpen}
           onClose={() => setIsQuickActionsOpen(false)}
+          onActionSelect={handleActionSelect}
+        />
+
+        {/* Forms */}
+        <LeadForm 
+          isOpen={activeForm === 'lead'} 
+          onClose={() => setActiveForm(null)} 
+        />
+        <VisitaForm 
+          isOpen={activeForm === 'visita'} 
+          onClose={() => setActiveForm(null)} 
+        />
+        <ImovelForm 
+          isOpen={activeForm === 'imovel'} 
+          onClose={() => setActiveForm(null)} 
+        />
+        <LigacaoForm 
+          isOpen={activeForm === 'ligacao'} 
+          onClose={() => setActiveForm(null)} 
         />
       </div>
     </DeviceFrame>
