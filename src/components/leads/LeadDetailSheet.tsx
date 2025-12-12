@@ -1,7 +1,6 @@
 import { Lead } from '@/hooks/useLeads';
-import { Sheet, SheetContent, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Phone, MessageCircle, Mail, Calendar, MapPin, DollarSign, Clock } from 'lucide-react';
+import { Phone, MessageCircle, Mail, Calendar, MapPin, DollarSign, Clock, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -24,7 +23,7 @@ const statusConfig: Record<string, { label: string; color: string }> = {
 };
 
 export const LeadDetailSheet = ({ lead, isOpen, onClose, onScheduleVisit }: LeadDetailSheetProps) => {
-  if (!lead) return null;
+  if (!lead || !isOpen) return null;
 
   const formatPhone = (phone: string | null) => {
     if (!phone) return null;
@@ -54,136 +53,162 @@ export const LeadDetailSheet = ({ lead, isOpen, onClose, onScheduleVisit }: Lead
   const status = statusConfig[lead.status] || statusConfig.novo;
 
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent 
-        side="bottom" 
-        className="h-[80vh] rounded-t-3xl px-4 pb-8 pt-6 overflow-hidden flex flex-col"
-        aria-describedby="lead-detail-description"
+    <>
+      {/* Overlay */}
+      <div 
+        className="absolute inset-0 bg-black/60 z-50 animate-fade-in"
+        onClick={onClose}
+      />
+      
+      {/* Bottom Sheet */}
+      <div 
+        className={cn(
+          "absolute bottom-0 left-0 right-0 z-50 bg-card rounded-t-3xl",
+          "max-h-[85%] flex flex-col",
+          "animate-slide-up-sheet"
+        )}
       >
-        <SheetDescription id="lead-detail-description" className="sr-only">
-          Detalhes do lead {lead.nome}
-        </SheetDescription>
-        
+        {/* Drag Handle */}
+        <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
+          <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+        </div>
+
         {/* Header */}
-        <div className="flex items-center gap-3 pb-4 border-b border-border flex-shrink-0">
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-lg font-semibold text-primary flex-shrink-0">
+        <div className="flex items-center gap-3 px-4 pb-3 border-b border-border flex-shrink-0">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-base font-semibold text-primary flex-shrink-0">
             {lead.nome.split(' ').map(n => n[0]).join('').slice(0, 2)}
           </div>
           <div className="flex-1 min-w-0">
-            <SheetTitle className="text-lg truncate">{lead.nome}</SheetTitle>
+            <h2 className="text-lg font-semibold text-foreground truncate">{lead.nome}</h2>
             <span className={cn(
-              "inline-block text-xs font-medium px-2.5 py-0.5 rounded-full text-white mt-1",
+              "inline-block text-[10px] font-medium px-2 py-0.5 rounded-full text-white",
               status.color
             )}>
               {status.label}
             </span>
           </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center"
+          >
+            <X className="w-4 h-4 text-muted-foreground" />
+          </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto space-y-4 pt-4">
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
           {/* Quick Actions */}
           <div className="grid grid-cols-4 gap-2">
             <Button
               variant="outline"
-              className="flex-col h-auto py-3 gap-1.5 text-xs"
+              size="sm"
+              className="flex-col h-auto py-2.5 gap-1 text-[10px]"
               onClick={handleWhatsApp}
               disabled={!lead.telefone}
             >
-              <MessageCircle className="w-5 h-5 text-success" />
+              <MessageCircle className="w-4 h-4 text-success" />
               WhatsApp
             </Button>
             <Button
               variant="outline"
-              className="flex-col h-auto py-3 gap-1.5 text-xs"
+              size="sm"
+              className="flex-col h-auto py-2.5 gap-1 text-[10px]"
               onClick={handleCall}
               disabled={!lead.telefone}
             >
-              <Phone className="w-5 h-5 text-info" />
+              <Phone className="w-4 h-4 text-info" />
               Ligar
             </Button>
             <Button
               variant="outline"
-              className="flex-col h-auto py-3 gap-1.5 text-xs"
+              size="sm"
+              className="flex-col h-auto py-2.5 gap-1 text-[10px]"
               onClick={handleEmail}
               disabled={!lead.email}
             >
-              <Mail className="w-5 h-5 text-warning" />
+              <Mail className="w-4 h-4 text-warning" />
               Email
             </Button>
             <Button
               variant="outline"
-              className="flex-col h-auto py-3 gap-1.5 text-xs"
+              size="sm"
+              className="flex-col h-auto py-2.5 gap-1 text-[10px]"
               onClick={() => onScheduleVisit?.(lead)}
             >
-              <Calendar className="w-5 h-5 text-primary" />
+              <Calendar className="w-4 h-4 text-primary" />
               Agendar
             </Button>
           </div>
 
           {/* Contact Info */}
           <div className="ios-card p-3 space-y-2">
-            <h3 className="text-sm font-semibold text-foreground">Contato</h3>
+            <h3 className="text-xs font-semibold text-foreground">Contato</h3>
             {lead.telefone && (
               <div className="flex items-center gap-2 text-sm">
-                <Phone className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <Phone className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
                 <span className="truncate">{lead.telefone}</span>
               </div>
             )}
             {lead.email && (
               <div className="flex items-center gap-2 text-sm">
-                <Mail className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <Mail className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
                 <span className="truncate">{lead.email}</span>
               </div>
             )}
           </div>
 
           {/* Preferences */}
-          <div className="ios-card p-3 space-y-2">
-            <h3 className="text-sm font-semibold text-foreground">Preferências</h3>
-            {lead.interesse && (
-              <div className="text-sm">
-                <span className="text-muted-foreground">Interesse: </span>
-                <span>{lead.interesse}</span>
-              </div>
-            )}
-            {lead.faixa_preco && (
-              <div className="flex items-center gap-2 text-sm">
-                <DollarSign className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                <span>{lead.faixa_preco}</span>
-              </div>
-            )}
-            {lead.bairros && lead.bairros.length > 0 && (
-              <div className="flex items-start gap-2 text-sm">
-                <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                <div className="flex flex-wrap gap-1">
-                  {lead.bairros.map((bairro, i) => (
-                    <span key={i} className="px-2 py-0.5 bg-secondary rounded-full text-xs">
-                      {bairro}
-                    </span>
-                  ))}
+          {(lead.interesse || lead.faixa_preco || (lead.bairros && lead.bairros.length > 0)) && (
+            <div className="ios-card p-3 space-y-2">
+              <h3 className="text-xs font-semibold text-foreground">Preferências</h3>
+              {lead.interesse && (
+                <div className="text-sm">
+                  <span className="text-muted-foreground">Interesse: </span>
+                  <span>{lead.interesse}</span>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+              {lead.faixa_preco && (
+                <div className="flex items-center gap-2 text-sm">
+                  <DollarSign className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                  <span>{lead.faixa_preco}</span>
+                </div>
+              )}
+              {lead.bairros && lead.bairros.length > 0 && (
+                <div className="flex items-start gap-2 text-sm">
+                  <MapPin className="w-3.5 h-3.5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <div className="flex flex-wrap gap-1">
+                    {lead.bairros.map((bairro, i) => (
+                      <span key={i} className="px-2 py-0.5 bg-secondary rounded-full text-[10px]">
+                        {bairro}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Timeline */}
           <div className="ios-card p-3 space-y-2">
-            <h3 className="text-sm font-semibold text-foreground">Histórico</h3>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Clock className="w-4 h-4 flex-shrink-0" />
+            <h3 className="text-xs font-semibold text-foreground">Histórico</h3>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Clock className="w-3.5 h-3.5 flex-shrink-0" />
               <span>
                 Último contato: {format(new Date(lead.ultimo_contato), "dd/MM 'às' HH:mm", { locale: ptBR })}
               </span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Calendar className="w-4 h-4 flex-shrink-0" />
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
               <span>
                 Cadastrado: {format(new Date(lead.created_at), "dd/MM/yyyy", { locale: ptBR })}
               </span>
             </div>
           </div>
         </div>
-      </SheetContent>
-    </Sheet>
+
+        {/* Safe area padding */}
+        <div className="h-6 flex-shrink-0" />
+      </div>
+    </>
   );
 };
