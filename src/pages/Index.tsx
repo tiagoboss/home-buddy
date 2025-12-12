@@ -4,6 +4,7 @@ import { QuickActionsSheet } from '@/components/sheets/QuickActionsSheet';
 import { DeviceFrame } from '@/components/layout/DeviceFrame';
 import { StatusBar } from '@/components/layout/StatusBar';
 import { HomeIndicator } from '@/components/layout/HomeIndicator';
+import { Header } from '@/components/layout/Header';
 import { HomePage } from '@/pages/HomePage';
 import { LeadsPage } from '@/pages/LeadsPage';
 import { AgendaPage } from '@/pages/AgendaPage';
@@ -28,14 +29,23 @@ const Index = () => {
         return <HomePage />;
     }
   };
+
+  const showHeader = activeTab === 'home';
   
   return (
     <DeviceFrame>
       <div className="bg-background h-full relative flex flex-col overflow-hidden">
-        {/* Fixed StatusBar */}
+        {/* Fixed Top - StatusBar */}
         <div className="flex-shrink-0 h-[38px] relative z-40">
           <StatusBar />
         </div>
+        
+        {/* Fixed Header (only on home) */}
+        {showHeader && (
+          <div className="flex-shrink-0 z-30">
+            <Header />
+          </div>
+        )}
         
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto pb-[100px]">

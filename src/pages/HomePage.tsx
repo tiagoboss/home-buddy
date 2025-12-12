@@ -1,5 +1,4 @@
 import { DollarSign, TrendingUp, Target, Clock, ChevronRight } from 'lucide-react';
-import { Header } from '@/components/layout/Header';
 import { KPICard } from '@/components/ui/KPICard';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { CompromissoCard } from '@/components/home/CompromissoCard';
@@ -12,9 +11,7 @@ export const HomePage = () => {
   const todayCompromissos = compromissos.slice(0, 3);
   
   return (
-    <div className="min-h-screen bg-background content-safe">
-      <Header />
-      
+    <div className="bg-background">
       <main className="py-4 space-y-5">
         {/* KPIs */}
         <section className="px-4">
