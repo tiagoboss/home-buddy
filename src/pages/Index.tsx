@@ -31,15 +31,20 @@ const Index = () => {
   
   return (
     <DeviceFrame>
-      <div className="bg-background h-full relative flex flex-col">
-        <StatusBar />
+      <div className="bg-background h-full relative flex flex-col overflow-hidden">
+        {/* Fixed StatusBar */}
+        <div className="flex-shrink-0 h-[38px] relative z-40">
+          <StatusBar />
+        </div>
         
-        <div className="flex-1 overflow-y-auto pt-[38px] pb-[100px]">
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto pb-[100px]">
           <div className="animate-fade-in">
             {renderContent()}
           </div>
         </div>
         
+        {/* Fixed Bottom Elements */}
         <TabBar 
           activeTab={activeTab}
           onTabChange={setActiveTab}
