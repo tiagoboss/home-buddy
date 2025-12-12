@@ -15,7 +15,7 @@ export const StatusBar = () => {
   });
 
   return (
-    <div className="absolute top-0 left-0 right-0 h-[54px] flex items-center justify-between px-8 z-40">
+    <div className="absolute top-0 left-0 right-0 h-[44px] flex items-center justify-between px-8 z-40">
       <span className="text-sm font-semibold text-foreground">
         {formattedTime}
       </span>
