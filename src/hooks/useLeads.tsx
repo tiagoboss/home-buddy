@@ -25,15 +25,19 @@ export const useLeads = () => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchLeads = async () => {
-    if (!user) return;
-
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      let query = supabase
         .from('leads')
         .select('*')
-        .eq('user_id', user.id)
         .order('ultimo_contato', { ascending: false });
+
+      // If user is logged in, filter by user_id
+      if (user) {
+        query = query.eq('user_id', user.id);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setLeads(data as Lead[]);
