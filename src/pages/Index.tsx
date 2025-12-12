@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { TabBar } from '@/components/layout/TabBar';
 import { QuickActionsSheet, QuickActionType } from '@/components/sheets/QuickActionsSheet';
 import { DeviceFrame } from '@/components/layout/DeviceFrame';
@@ -15,22 +14,12 @@ import { VisitaForm } from '@/components/forms/VisitaForm';
 import { ImovelForm } from '@/components/forms/ImovelForm';
 import { LigacaoForm } from '@/components/forms/LigacaoForm';
 import { TabType } from '@/types';
-import { useAuth } from '@/hooks/useAuth';
-import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Index = () => {
-  const { user, loading } = useAuth();
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
   const [activeForm, setActiveForm] = useState<QuickActionType>(null);
-
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate('/auth');
-    }
-  }, [user, loading, navigate]);
 
   const handleActionSelect = (action: QuickActionType) => {
     if (action === 'proposta') {
@@ -43,20 +32,6 @@ const Index = () => {
     }
     setActiveForm(action);
   };
-
-  if (loading) {
-    return (
-      <DeviceFrame>
-        <div className="bg-background h-full flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        </div>
-      </DeviceFrame>
-    );
-  }
-
-  if (!user) {
-    return null;
-  }
   
   const renderContent = () => {
     switch (activeTab) {
