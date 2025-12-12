@@ -1,4 +1,4 @@
-import { FileText, Calendar, Camera, FileCheck, Phone, MapPin, X } from 'lucide-react';
+import { FileText, Calendar, Camera, ClipboardList, Phone, MapPin, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface QuickActionsSheetProps {
@@ -10,8 +10,8 @@ const actions = [
   { icon: FileText, label: 'Registrar Lead', color: 'bg-info' },
   { icon: Calendar, label: 'Agendar Visita', color: 'bg-success' },
   { icon: Camera, label: 'Capturar Imóvel', color: 'bg-warning' },
-  { icon: FileCheck, label: 'Nova Proposta', color: 'bg-primary' },
-  { icon: Phone, label: 'Registrar Ligação', color: 'bg-muted-foreground' },
+  { icon: ClipboardList, label: 'Nova Proposta', color: 'bg-secondary', iconColor: 'text-muted-foreground' },
+  { icon: Phone, label: 'Registrar Ligação', color: 'bg-muted', iconColor: 'text-muted-foreground' },
   { icon: MapPin, label: 'Check-in Visita', color: 'bg-destructive' },
 ];
 
@@ -57,7 +57,7 @@ export const QuickActionsSheet = ({ isOpen, onClose }: QuickActionsSheetProps) =
                   "w-12 h-12 rounded-2xl flex items-center justify-center",
                   action.color
                 )}>
-                  <action.icon className="w-6 h-6 text-white" />
+                  <action.icon className={cn("w-6 h-6", action.iconColor || "text-white")} />
                 </div>
                 <span className="text-xs font-medium text-foreground text-center leading-tight">
                   {action.label}
