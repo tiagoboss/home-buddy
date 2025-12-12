@@ -34,7 +34,7 @@ const Index = () => {
       <div className="bg-background h-full relative flex flex-col">
         <StatusBar />
         
-        <div className="flex-1 overflow-y-auto pt-[54px] pb-[100px]">
+        <div className="flex-1 overflow-y-auto pt-[44px] pb-[100px]">
           <div className="animate-fade-in">
             {renderContent()}
           </div>
