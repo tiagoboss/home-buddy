@@ -2,6 +2,13 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
+export interface LeadInfo {
+  id: string;
+  nome: string;
+  telefone: string | null;
+  email: string | null;
+}
+
 export interface Compromisso {
   id: string;
   user_id: string;
@@ -13,6 +20,7 @@ export interface Compromisso {
   endereco: string | null;
   status: 'pendente' | 'confirmado' | 'cancelado' | 'realizado';
   lead_id: string | null;
+  lead: LeadInfo | null;
   created_at: string;
   updated_at: string;
 }
@@ -30,7 +38,10 @@ export const useCompromissos = () => {
       setLoading(true);
       const { data, error } = await supabase
         .from('compromissos')
-        .select('*')
+        .select(`
+          *,
+          lead:leads(id, nome, telefone, email)
+        `)
         .eq('user_id', user.id)
         .order('data', { ascending: true })
         .order('hora', { ascending: true });

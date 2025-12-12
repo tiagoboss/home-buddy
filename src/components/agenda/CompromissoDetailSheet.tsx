@@ -89,14 +89,24 @@ export const CompromissoDetailSheet = ({
   const formattedDate = format(new Date(compromisso.data), "EEEE, d 'de' MMMM", { locale: ptBR });
   const overlayOpacity = Math.max(0, 0.6 - (dragOffset / 500));
 
+  const formatPhone = (phone: string | null) => {
+    if (!phone) return null;
+    return phone.replace(/\D/g, '');
+  };
+
+  const leadPhone = compromisso.lead?.telefone;
+  const formattedPhone = formatPhone(leadPhone);
+
   const handleCall = () => {
-    // For real implementation, you'd have client phone from lead
-    console.log('Ligar para cliente');
+    if (formattedPhone) {
+      window.open(`tel:+55${formattedPhone}`);
+    }
   };
 
   const handleWhatsApp = () => {
-    // For real implementation, you'd have client phone from lead
-    console.log('WhatsApp para cliente');
+    if (formattedPhone) {
+      window.open(`https://wa.me/55${formattedPhone}`, '_blank');
+    }
   };
 
   const handleNavigate = () => {
@@ -200,22 +210,30 @@ export const CompromissoDetailSheet = ({
           </div>
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-2 gap-3 mb-6">
-            <button 
-              onClick={handleCall}
-              className="flex items-center justify-center gap-2 p-4 bg-info/10 rounded-xl animate-scale-press"
-            >
-              <Phone className="w-5 h-5 text-info" />
-              <span className="font-medium text-info">Ligar</span>
-            </button>
-            <button 
-              onClick={handleWhatsApp}
-              className="flex items-center justify-center gap-2 p-4 bg-success/10 rounded-xl animate-scale-press"
-            >
+          {formattedPhone ? (
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              <button 
+                onClick={handleCall}
+                className="flex items-center justify-center gap-2 p-4 bg-info/10 rounded-xl animate-scale-press"
+              >
+                <Phone className="w-5 h-5 text-info" />
+                <span className="font-medium text-info">Ligar</span>
+              </button>
+              <button 
+                onClick={handleWhatsApp}
+                className="flex items-center justify-center gap-2 p-4 bg-success/10 rounded-xl animate-scale-press"
+              >
               <MessageCircle className="w-5 h-5 text-success" />
               <span className="font-medium text-success">WhatsApp</span>
             </button>
           </div>
+          ) : (
+            <div className="p-4 bg-muted/50 rounded-xl mb-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                Sem telefone do lead vinculado
+              </p>
+            </div>
+          )}
 
           {/* Status Actions */}
           {compromisso.status !== 'realizado' && compromisso.status !== 'cancelado' && (
