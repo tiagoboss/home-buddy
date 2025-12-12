@@ -22,12 +22,12 @@ export const QuickActionsSheet = ({ isOpen, onClose }: QuickActionsSheetProps) =
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 animate-fade-in"
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm z-50 animate-fade-in"
         onClick={onClose}
       />
       
       {/* Sheet */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 animate-slide-up-sheet">
+      <div className="absolute bottom-0 left-0 right-0 z-50 animate-slide-up-sheet">
         <div className="bg-card rounded-t-3xl shadow-elevated max-w-lg mx-auto">
           {/* Handle */}
           <div className="flex justify-center pt-3 pb-2">
