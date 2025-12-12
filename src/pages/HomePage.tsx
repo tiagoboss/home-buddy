@@ -1,0 +1,107 @@
+import { DollarSign, TrendingUp, Target, Clock, ChevronRight } from 'lucide-react';
+import { Header } from '@/components/layout/Header';
+import { KPICard } from '@/components/ui/KPICard';
+import { ProgressBar } from '@/components/ui/ProgressBar';
+import { CompromissoCard } from '@/components/home/CompromissoCard';
+import { LeadCard } from '@/components/home/LeadCard';
+import { ImovelCard } from '@/components/home/ImovelCard';
+import { corretor, compromissos, leads, imoveis } from '@/data/mockData';
+
+export const HomePage = () => {
+  const hotLeads = leads.filter(l => l.status === 'quente' || l.status === 'negociacao');
+  const todayCompromissos = compromissos.slice(0, 3);
+  
+  return (
+    <div className="min-h-screen bg-background content-safe">
+      <Header />
+      
+      <main className="px-4 py-4 space-y-6">
+        {/* KPIs */}
+        <section>
+          <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar snap-x-mandatory -mx-4 px-4">
+            <KPICard 
+              icon={DollarSign} 
+              value={corretor.vendas} 
+              label="vendas este mês"
+              iconColor="bg-success"
+            />
+            <KPICard 
+              icon={TrendingUp} 
+              value={`${corretor.taxaConversao}%`} 
+              label="taxa conversão"
+              iconColor="bg-info"
+            />
+            <KPICard 
+              icon={Target} 
+              value={`${Math.round((corretor.vendas / corretor.meta) * 100)}%`} 
+              label="meta alcançada"
+              iconColor="bg-warning"
+            />
+            <KPICard 
+              icon={Clock} 
+              value={`${corretor.tempoMedioFechamento}d`} 
+              label="tempo méd. fech."
+            />
+          </div>
+        </section>
+        
+        {/* Progress */}
+        <section>
+          <ProgressBar 
+            current={corretor.vendas} 
+            total={corretor.meta}
+            label="Meta Mensal"
+          />
+        </section>
+        
+        {/* Próximos Compromissos */}
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-base font-semibold text-foreground">Próximos Compromissos</h2>
+            <button className="flex items-center gap-1 text-sm text-primary font-medium animate-scale-press">
+              Ver todos
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="ios-section">
+            {todayCompromissos.map((c) => (
+              <CompromissoCard key={c.id} compromisso={c} />
+            ))}
+          </div>
+        </section>
+        
+        {/* Leads Quentes */}
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-base font-semibold text-foreground">Leads Quentes</h2>
+            <button className="flex items-center gap-1 text-sm text-primary font-medium animate-scale-press">
+              Ver todos
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar snap-x-mandatory -mx-4 px-4">
+            {hotLeads.map((lead) => (
+              <LeadCard key={lead.id} lead={lead} compact />
+            ))}
+          </div>
+        </section>
+        
+        {/* Imóveis em Destaque */}
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-base font-semibold text-foreground">Imóveis em Destaque</h2>
+            <button className="flex items-center gap-1 text-sm text-primary font-medium animate-scale-press">
+              Ver todos
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar snap-x-mandatory -mx-4 px-4">
+            {imoveis.map((imovel) => (
+              <ImovelCard key={imovel.id} imovel={imovel} />
+            ))}
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+};
