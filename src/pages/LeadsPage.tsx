@@ -1,34 +1,79 @@
 import { useState } from 'react';
-import { Search, Filter, MessageCircle, Phone } from 'lucide-react';
-import { LeadCard } from '@/components/home/LeadCard';
-import { leads } from '@/data/mockData';
-import { Lead } from '@/types';
+import { Search, Filter, Plus, Loader2, RefreshCw } from 'lucide-react';
+import { SwipeableLeadCard } from '@/components/leads/SwipeableLeadCard';
+import { LeadDetailSheet } from '@/components/leads/LeadDetailSheet';
+import { useLeads, Lead } from '@/hooks/useLeads';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 const filters = [
   { id: 'todos', label: 'Todos' },
   { id: 'novo', label: 'Novos' },
   { id: 'quente', label: 'Quentes' },
-  { id: 'negociacao', label: 'Em Negociação' },
+  { id: 'morno', label: 'Mornos' },
+  { id: 'frio', label: 'Frios' },
+  { id: 'negociacao', label: 'Negociação' },
+  { id: 'fechado', label: 'Fechados' },
+  { id: 'perdido', label: 'Perdidos' },
 ];
 
-export const LeadsPage = () => {
+interface LeadsPageProps {
+  onAddLead?: () => void;
+  onScheduleVisit?: (lead: Lead) => void;
+}
+
+export const LeadsPage = ({ onAddLead, onScheduleVisit }: LeadsPageProps) => {
+  const { leads, loading, fetchLeads, deleteLead } = useLeads();
   const [activeFilter, setActiveFilter] = useState('todos');
   const [searchQuery, setSearchQuery] = useState('');
-  const [swipedLead, setSwipedLead] = useState<string | null>(null);
-  
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await fetchLeads();
+    setIsRefreshing(false);
+  };
+
   const filteredLeads = leads.filter((lead) => {
     const matchesFilter = activeFilter === 'todos' || lead.status === activeFilter;
     const matchesSearch = lead.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          lead.telefone.includes(searchQuery);
+                          (lead.telefone?.includes(searchQuery) ?? false);
     return matchesFilter && matchesSearch;
   });
+
+  const getFilterCount = (filterId: string) => {
+    if (filterId === 'todos') return leads.length;
+    return leads.filter(l => l.status === filterId).length;
+  };
   
   return (
     <div className="min-h-screen bg-background content-safe">
       {/* Header */}
       <header className="sticky top-0 z-40 glassmorphism px-4 py-3">
-        <h1 className="text-2xl font-bold text-foreground tracking-tight mb-3">Meus Leads</h1>
+        <div className="flex items-center justify-between mb-3">
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Meus Leads</h1>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="h-9 w-9"
+            >
+              <RefreshCw className={cn("w-5 h-5", isRefreshing && "animate-spin")} />
+            </Button>
+            {onAddLead && (
+              <Button
+                size="icon"
+                onClick={onAddLead}
+                className="h-9 w-9 rounded-full"
+              >
+                <Plus className="w-5 h-5" />
+              </Button>
+            )}
+          </div>
+        </div>
         
         {/* Search */}
         <div className="relative mb-3">
@@ -42,63 +87,84 @@ export const LeadsPage = () => {
           />
         </div>
         
-        {/* Filters */}
+        {/* Filters with counts */}
         <div className="flex gap-2 overflow-x-auto hide-scrollbar -mx-4 px-4">
-          {filters.map((filter) => (
-            <button
-              key={filter.id}
-              onClick={() => setActiveFilter(filter.id)}
-              className={cn(
-                "flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 animate-scale-press",
-                activeFilter === filter.id
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-muted-foreground"
-              )}
-            >
-              {filter.label}
-            </button>
-          ))}
+          {filters.map((filter) => {
+            const count = getFilterCount(filter.id);
+            return (
+              <button
+                key={filter.id}
+                onClick={() => setActiveFilter(filter.id)}
+                className={cn(
+                  "flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 animate-scale-press flex items-center gap-1.5",
+                  activeFilter === filter.id
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-muted-foreground"
+                )}
+              >
+                {filter.label}
+                {count > 0 && (
+                  <span className={cn(
+                    "text-xs px-1.5 py-0.5 rounded-full min-w-[20px] text-center",
+                    activeFilter === filter.id
+                      ? "bg-primary-foreground/20"
+                      : "bg-muted"
+                  )}>
+                    {count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
       </header>
       
       {/* Leads List */}
       <main className="px-4 py-4">
-        <div className="ios-section">
-          {filteredLeads.map((lead) => (
-            <div 
-              key={lead.id} 
-              className="relative overflow-hidden"
-              onTouchStart={() => setSwipedLead(null)}
-            >
-              {/* Swipe Actions (Visual only for now) */}
-              <div className="absolute inset-y-0 right-0 flex items-center">
-                <button className="h-full px-4 bg-success flex items-center justify-center">
-                  <MessageCircle className="w-5 h-5 text-white" />
-                </button>
-                <button className="h-full px-4 bg-info flex items-center justify-center">
-                  <Phone className="w-5 h-5 text-white" />
-                </button>
-              </div>
-              
-              <div className="relative bg-card">
-                <LeadCard lead={lead} />
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        {filteredLeads.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
-              <Filter className="w-8 h-8 text-muted-foreground" />
-            </div>
-            <p className="text-foreground font-medium">Nenhum lead encontrado</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Tente ajustar seus filtros
-            </p>
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
+        ) : (
+          <>
+            <div className="space-y-2">
+              {filteredLeads.map((lead) => (
+                <SwipeableLeadCard
+                  key={lead.id}
+                  lead={lead}
+                  onClick={() => setSelectedLead(lead)}
+                  onDelete={() => deleteLead(lead.id)}
+                />
+              ))}
+            </div>
+            
+            {filteredLeads.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
+                  <Filter className="w-8 h-8 text-muted-foreground" />
+                </div>
+                <p className="text-foreground font-medium">Nenhum lead encontrado</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {leads.length === 0 
+                    ? 'Adicione seu primeiro lead clicando no botão +' 
+                    : 'Tente ajustar seus filtros'}
+                </p>
+              </div>
+            )}
+          </>
         )}
       </main>
+
+      {/* Lead Detail Sheet */}
+      <LeadDetailSheet
+        lead={selectedLead}
+        isOpen={!!selectedLead}
+        onClose={() => setSelectedLead(null)}
+        onScheduleVisit={(lead) => {
+          setSelectedLead(null);
+          onScheduleVisit?.(lead);
+        }}
+      />
     </div>
   );
 };

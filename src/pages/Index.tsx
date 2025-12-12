@@ -38,7 +38,12 @@ const Index = () => {
       case 'home':
         return <HomePage />;
       case 'leads':
-        return <LeadsPage />;
+        return (
+          <LeadsPage 
+            onAddLead={() => setActiveForm('lead')}
+            onScheduleVisit={() => setActiveForm('visita')}
+          />
+        );
       case 'agenda':
         return <AgendaPage />;
       case 'perfil':
