@@ -51,6 +51,7 @@ export const VisitaForm = ({ isOpen, onClose }: VisitaFormProps) => {
         endereco: formData.endereco || null,
         status: 'pendente',
         lead_id: formData.lead_id || null,
+        lead: null,
       });
 
       if (error) throw error;
