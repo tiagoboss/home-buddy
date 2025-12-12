@@ -31,11 +31,13 @@ const Index = () => {
   
   return (
     <DeviceFrame>
-      <div className="bg-background h-full relative overflow-y-auto">
+      <div className="bg-background h-full relative flex flex-col">
         <StatusBar />
         
-        <div className="pt-[44px] pb-[100px] animate-fade-in">
-          {renderContent()}
+        <div className="flex-1 overflow-y-auto pt-[44px] pb-[100px]">
+          <div className="animate-fade-in">
+            {renderContent()}
+          </div>
         </div>
         
         <TabBar 
