@@ -1,19 +1,31 @@
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Home, Phone, Users, MapPin, Navigation } from 'lucide-react';
-import { compromissos } from '@/data/mockData';
+import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { useCompromissos, Compromisso } from '@/hooks/useCompromissos';
+import { SwipeableCompromissoCard } from '@/components/agenda/SwipeableCompromissoCard';
+import { CompromissoDetailSheet } from '@/components/agenda/CompromissoDetailSheet';
+import { AgendaEmptyState } from '@/components/agenda/AgendaEmptyState';
+import { VisitaForm } from '@/components/forms/VisitaForm';
 import { cn } from '@/lib/utils';
+import { format, isSameDay, parseISO } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { toast } from 'sonner';
 
 const views = ['Dia', 'Semana', 'Mês'];
-
-const tipoConfig = {
-  visita: { icon: Home, color: 'bg-success', label: 'Visita' },
-  ligacao: { icon: Phone, color: 'bg-info', label: 'Ligação' },
-  reuniao: { icon: Users, color: 'bg-warning', label: 'Reunião' },
-};
 
 export const AgendaPage = () => {
   const [activeView, setActiveView] = useState('Dia');
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedCompromisso, setSelectedCompromisso] = useState<Compromisso | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isVisitaFormOpen, setIsVisitaFormOpen] = useState(false);
+  
+  const { compromissos, loading, updateCompromisso } = useCompromissos();
+  
+  // Filter compromissos for selected date
+  const filteredCompromissos = compromissos.filter(c => {
+    const compromissoDate = parseISO(c.data);
+    return isSameDay(compromissoDate, selectedDate);
+  });
   
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('pt-BR', {
@@ -27,6 +39,46 @@ export const AgendaPage = () => {
     const newDate = new Date(selectedDate);
     newDate.setDate(newDate.getDate() + (direction === 'next' ? 1 : -1));
     setSelectedDate(newDate);
+  };
+
+  const handleCardClick = (compromisso: Compromisso) => {
+    setSelectedCompromisso(compromisso);
+    setIsDetailOpen(true);
+  };
+
+  const handleCloseDetail = () => {
+    setIsDetailOpen(false);
+    setTimeout(() => setSelectedCompromisso(null), 200);
+  };
+
+  const handleConfirm = async (compromisso: Compromisso) => {
+    const { error } = await updateCompromisso(compromisso.id, { status: 'confirmado' });
+    if (error) {
+      toast.error('Erro ao confirmar compromisso');
+    } else {
+      toast.success('Compromisso confirmado!');
+      if (isDetailOpen) handleCloseDetail();
+    }
+  };
+
+  const handleCancel = async (compromisso: Compromisso) => {
+    const { error } = await updateCompromisso(compromisso.id, { status: 'cancelado' });
+    if (error) {
+      toast.error('Erro ao cancelar compromisso');
+    } else {
+      toast.success('Compromisso cancelado');
+      if (isDetailOpen) handleCloseDetail();
+    }
+  };
+
+  const handleComplete = async (compromisso: Compromisso) => {
+    const { error } = await updateCompromisso(compromisso.id, { status: 'realizado' });
+    if (error) {
+      toast.error('Erro ao marcar como realizado');
+    } else {
+      toast.success('Compromisso realizado!');
+      if (isDetailOpen) handleCloseDetail();
+    }
   };
   
   return (
@@ -75,70 +127,49 @@ export const AgendaPage = () => {
         </div>
       </header>
       
-      {/* Timeline */}
+      {/* Content */}
       <main className="px-4 py-4">
-        <div className="space-y-3">
-          {compromissos.map((compromisso, index) => {
-            const config = tipoConfig[compromisso.tipo];
-            const Icon = config.icon;
-            
-            return (
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : filteredCompromissos.length === 0 ? (
+          <AgendaEmptyState onScheduleVisit={() => setIsVisitaFormOpen(true)} />
+        ) : (
+          <div className="space-y-3">
+            {filteredCompromissos.map((compromisso, index) => (
               <div 
                 key={compromisso.id}
-                className="ios-card p-4 animate-scale-press"
                 style={{ animationDelay: `${index * 50}ms` }}
+                className="animate-fade-in"
               >
-                <div className="flex items-start gap-3">
-                  <div className={cn(
-                    "w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0",
-                    config.color
-                  )}>
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-lg font-semibold text-foreground">
-                        {compromisso.hora}
-                      </span>
-                      <span className={cn(
-                        "text-xs font-medium px-2 py-1 rounded-full",
-                        compromisso.status === 'confirmado' 
-                          ? "bg-success/10 text-success"
-                          : "bg-warning/10 text-warning"
-                      )}>
-                        {compromisso.status === 'confirmado' ? 'Confirmado' : 'Pendente'}
-                      </span>
-                    </div>
-                    
-                    <p className="text-base font-medium text-foreground">
-                      {config.label} - {compromisso.cliente}
-                    </p>
-                    
-                    {compromisso.imovel && (
-                      <p className="text-sm text-muted-foreground mt-0.5">
-                        {compromisso.imovel}
-                      </p>
-                    )}
-                    
-                    {compromisso.endereco && (
-                      <div className="flex items-center gap-2 mt-2">
-                        <div className="flex items-center gap-1 text-sm text-muted-foreground flex-1 min-w-0">
-                          <MapPin className="w-4 h-4 flex-shrink-0" />
-                          <span className="truncate">{compromisso.endereco}</span>
-                        </div>
-                        <button className="w-8 h-8 rounded-full bg-info flex items-center justify-center animate-scale-press flex-shrink-0">
-                          <Navigation className="w-4 h-4 text-white" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <SwipeableCompromissoCard
+                  compromisso={compromisso}
+                  onClick={() => handleCardClick(compromisso)}
+                  onConfirm={() => handleConfirm(compromisso)}
+                  onCancel={() => handleCancel(compromisso)}
+                />
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        )}
       </main>
+
+      {/* Detail Sheet */}
+      <CompromissoDetailSheet
+        compromisso={selectedCompromisso}
+        isOpen={isDetailOpen}
+        onClose={handleCloseDetail}
+        onConfirm={selectedCompromisso ? () => handleConfirm(selectedCompromisso) : undefined}
+        onCancel={selectedCompromisso ? () => handleCancel(selectedCompromisso) : undefined}
+        onComplete={selectedCompromisso ? () => handleComplete(selectedCompromisso) : undefined}
+      />
+
+      {/* Visita Form */}
+      <VisitaForm 
+        isOpen={isVisitaFormOpen} 
+        onClose={() => setIsVisitaFormOpen(false)} 
+      />
     </div>
   );
 };
