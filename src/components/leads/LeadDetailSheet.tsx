@@ -4,6 +4,7 @@ import { Phone, MessageCircle, Mail, Calendar, MapPin, DollarSign, Clock, X } fr
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useState, useRef, useCallback } from 'react';
 
 interface LeadDetailSheetProps {
   lead: Lead | null;
@@ -22,7 +23,55 @@ const statusConfig: Record<string, { label: string; color: string }> = {
   perdido: { label: 'Perdido', color: 'bg-destructive/50' },
 };
 
+const DRAG_THRESHOLD = 100;
+const VELOCITY_THRESHOLD = 0.5;
+
 export const LeadDetailSheet = ({ lead, isOpen, onClose, onScheduleVisit }: LeadDetailSheetProps) => {
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isClosing, setIsClosing] = useState(false);
+  const dragStartY = useRef(0);
+  const dragStartTime = useRef(0);
+  const isDragging = useRef(false);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    dragStartY.current = e.touches[0].clientY;
+    dragStartTime.current = Date.now();
+    isDragging.current = true;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isDragging.current) return;
+    
+    const currentY = e.touches[0].clientY;
+    const diff = currentY - dragStartY.current;
+    
+    // Only allow dragging down
+    if (diff > 0) {
+      setDragOffset(diff);
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+
+    const elapsed = Date.now() - dragStartTime.current;
+    const velocity = dragOffset / elapsed;
+
+    // Close if dragged past threshold or fast swipe
+    if (dragOffset > DRAG_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
+      setIsClosing(true);
+      setTimeout(() => {
+        onClose();
+        setDragOffset(0);
+        setIsClosing(false);
+      }, 200);
+    } else {
+      // Animate back to original position
+      setDragOffset(0);
+    }
+  }, [dragOffset, onClose]);
+
   if (!lead || !isOpen) return null;
 
   const formatPhone = (phone: string | null) => {
@@ -52,11 +101,15 @@ export const LeadDetailSheet = ({ lead, isOpen, onClose, onScheduleVisit }: Lead
 
   const status = statusConfig[lead.status] || statusConfig.novo;
 
+  // Calculate overlay opacity based on drag
+  const overlayOpacity = Math.max(0, 0.6 - (dragOffset / 500));
+
   return (
     <>
       {/* Overlay */}
       <div 
-        className="absolute inset-0 bg-black/60 z-50 animate-fade-in"
+        className="absolute inset-0 bg-black z-50 animate-fade-in transition-opacity duration-200"
+        style={{ opacity: overlayOpacity }}
         onClick={onClose}
       />
       
@@ -64,13 +117,26 @@ export const LeadDetailSheet = ({ lead, isOpen, onClose, onScheduleVisit }: Lead
       <div 
         className={cn(
           "absolute bottom-0 left-0 right-0 z-50 bg-card rounded-t-3xl",
-          "max-h-[85%] flex flex-col",
-          "animate-slide-up-sheet"
+          "max-h-[85%] flex flex-col touch-none",
+          !isClosing && dragOffset === 0 && "animate-slide-up-sheet",
+          isClosing && "transition-transform duration-200 ease-out"
         )}
+        style={{ 
+          transform: isClosing 
+            ? 'translateY(100%)' 
+            : `translateY(${dragOffset}px)`,
+          transition: dragOffset === 0 && !isClosing ? 'transform 0.2s ease-out' : undefined
+        }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         {/* Drag Handle */}
-        <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
-          <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+        <div className="flex justify-center pt-3 pb-2 flex-shrink-0 cursor-grab active:cursor-grabbing">
+          <div className={cn(
+            "w-10 h-1 rounded-full bg-muted-foreground/30 transition-all",
+            dragOffset > 0 && "w-12 bg-muted-foreground/50"
+          )} />
         </div>
 
         {/* Header */}
