@@ -15,32 +15,32 @@ export const HomePage = () => {
     <div className="min-h-screen bg-background content-safe">
       <Header />
       
-      <main className="px-4 py-4 space-y-6">
+      <main className="px-4 py-4 space-y-5">
         {/* KPIs */}
         <section>
-          <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar snap-x-mandatory -mx-4 px-4">
+          <div className="flex gap-2.5 overflow-x-auto pb-2 hide-scrollbar snap-x-mandatory -mx-4 px-4">
             <KPICard 
               icon={DollarSign} 
               value={corretor.vendas} 
-              label="vendas este mês"
+              label="vendas"
               iconColor="bg-success"
             />
             <KPICard 
               icon={TrendingUp} 
               value={`${corretor.taxaConversao}%`} 
-              label="taxa conversão"
+              label="conversão"
               iconColor="bg-info"
             />
             <KPICard 
               icon={Target} 
               value={`${Math.round((corretor.vendas / corretor.meta) * 100)}%`} 
-              label="meta alcançada"
+              label="meta"
               iconColor="bg-warning"
             />
             <KPICard 
               icon={Clock} 
               value={`${corretor.tempoMedioFechamento}d`} 
-              label="tempo méd. fech."
+              label="fechamento"
             />
           </div>
         </section>
@@ -56,11 +56,11 @@ export const HomePage = () => {
         
         {/* Próximos Compromissos */}
         <section>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-semibold text-foreground">Próximos Compromissos</h2>
-            <button className="flex items-center gap-1 text-sm text-primary font-medium animate-scale-press">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Próximos Compromissos</h2>
+            <button className="flex items-center gap-0.5 text-xs text-primary font-medium animate-scale-press">
               Ver todos
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
           <div className="ios-section">
@@ -72,14 +72,14 @@ export const HomePage = () => {
         
         {/* Leads Quentes */}
         <section>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-semibold text-foreground">Leads Quentes</h2>
-            <button className="flex items-center gap-1 text-sm text-primary font-medium animate-scale-press">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Leads Quentes</h2>
+            <button className="flex items-center gap-0.5 text-xs text-primary font-medium animate-scale-press">
               Ver todos
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
-          <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar snap-x-mandatory -mx-4 px-4">
+          <div className="flex gap-2.5 overflow-x-auto pb-2 hide-scrollbar snap-x-mandatory -mx-4 px-4">
             {hotLeads.map((lead) => (
               <LeadCard key={lead.id} lead={lead} compact />
             ))}
@@ -88,14 +88,14 @@ export const HomePage = () => {
         
         {/* Imóveis em Destaque */}
         <section>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-semibold text-foreground">Imóveis em Destaque</h2>
-            <button className="flex items-center gap-1 text-sm text-primary font-medium animate-scale-press">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Imóveis em Destaque</h2>
+            <button className="flex items-center gap-0.5 text-xs text-primary font-medium animate-scale-press">
               Ver todos
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
-          <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar snap-x-mandatory -mx-4 px-4">
+          <div className="flex gap-2.5 overflow-x-auto pb-2 hide-scrollbar snap-x-mandatory -mx-4 px-4">
             {imoveis.map((imovel) => (
               <ImovelCard key={imovel.id} imovel={imovel} />
             ))}

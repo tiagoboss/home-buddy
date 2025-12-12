@@ -10,9 +10,9 @@ interface LeadCardProps {
 export const LeadCard = ({ lead, compact = false }: LeadCardProps) => {
   if (compact) {
     return (
-      <div className="flex-shrink-0 w-[140px] ios-card p-3 animate-scale-press snap-start">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-xs font-semibold text-primary">
+      <div className="flex-shrink-0 w-[110px] ios-card p-2.5 animate-scale-press snap-start">
+        <div className="flex items-center gap-2 mb-1.5">
+          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-[10px] font-semibold text-primary">
             {lead.nome.split(' ').map(n => n[0]).join('').slice(0, 2)}
           </div>
           <div className={cn(
@@ -20,8 +20,8 @@ export const LeadCard = ({ lead, compact = false }: LeadCardProps) => {
             getStatusColor(lead.status)
           )} />
         </div>
-        <p className="text-sm font-medium text-foreground truncate">{lead.nome.split(' ')[0]}</p>
-        <p className="text-xs text-muted-foreground mt-0.5">
+        <p className="text-xs font-medium text-foreground truncate">{lead.nome.split(' ')[0]}</p>
+        <p className="text-[9px] text-muted-foreground mt-0.5">
           {getTimeSinceContact(lead.ultimoContato)}
         </p>
       </div>

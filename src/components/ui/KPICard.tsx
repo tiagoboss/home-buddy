@@ -11,18 +11,18 @@ interface KPICardProps {
 
 export const KPICard = ({ icon: Icon, value, label, trend, iconColor }: KPICardProps) => {
   return (
-    <div className="flex-shrink-0 w-[130px] ios-card p-4 animate-scale-press snap-start">
+    <div className="flex-shrink-0 w-[100px] ios-card p-3 animate-scale-press snap-start">
       <div className={cn(
-        "w-10 h-10 rounded-xl flex items-center justify-center mb-3",
+        "w-7 h-7 rounded-lg flex items-center justify-center mb-2",
         iconColor || "bg-primary/10"
       )}>
         <Icon className={cn(
-          "w-5 h-5",
+          "w-3.5 h-3.5",
           iconColor ? "text-primary-foreground" : "text-primary"
         )} />
       </div>
-      <p className="text-2xl font-bold text-foreground tracking-tight">{value}</p>
-      <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
+      <p className="text-lg font-bold text-foreground tracking-tight leading-tight">{value}</p>
+      <p className="text-[10px] text-muted-foreground mt-0.5 leading-tight">{label}</p>
     </div>
   );
 };
