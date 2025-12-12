@@ -313,7 +313,7 @@ export const PerfilPage = () => {
       </section>
       
       {/* Settings */}
-      <section className="px-4 space-y-4">
+      <section className="px-4 pb-4 space-y-4">
         {/* Notifications */}
         <div className="ios-section">
           <button className="w-full ios-list-item animate-scale-press">
