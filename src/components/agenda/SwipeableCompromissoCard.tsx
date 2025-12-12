@@ -70,17 +70,15 @@ export const SwipeableCompromissoCard = ({
   const isCancelled = compromisso.status === 'cancelado';
 
   return (
-    <div className="relative overflow-hidden rounded-2xl shadow-sm">
+    <div className="relative overflow-hidden rounded-2xl">
       {/* Background Actions */}
       <div className="absolute inset-0 flex">
-        {/* Left side - Confirm (shown on right swipe) */}
         <div className={cn(
           "flex-1 flex items-center justify-start pl-6 bg-success transition-opacity duration-200",
           translateX > 40 ? "opacity-100" : "opacity-50"
         )}>
           <Check className="w-6 h-6 text-white" />
         </div>
-        {/* Right side - Cancel (shown on left swipe) */}
         <div className={cn(
           "flex-1 flex items-center justify-end pr-6 bg-destructive transition-opacity duration-200",
           translateX < -40 ? "opacity-100" : "opacity-50"
@@ -89,10 +87,10 @@ export const SwipeableCompromissoCard = ({
         </div>
       </div>
 
-      {/* Card Content */}
+      {/* Card Content - Compact */}
       <div
         className={cn(
-          "relative bg-card border border-border/50 rounded-2xl p-4 transition-all duration-200 ease-out cursor-pointer",
+          "relative bg-card border border-border/50 rounded-2xl px-4 py-3 transition-all duration-200 ease-out cursor-pointer",
           isCompleted && "opacity-60",
           isCancelled && "opacity-40"
         )}
@@ -102,71 +100,48 @@ export const SwipeableCompromissoCard = ({
         onTouchEnd={handleTouchEnd}
         onClick={() => translateX === 0 && onClick()}
       >
-        <div className="flex gap-4">
+        <div className="flex items-center gap-3">
           {/* Icon */}
           <div className={cn(
-            "w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm",
+            "w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0",
             config.bgColor
           )}>
-            <Icon className="w-7 h-7 text-white" />
+            <Icon className="w-5 h-5 text-white" />
           </div>
           
           {/* Content */}
-          <div className="flex-1 min-w-0 space-y-1.5">
-            {/* Header: Time + Status */}
-            <div className="flex items-center justify-between">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
               <span className={cn(
-                "text-xl font-bold text-foreground tracking-tight",
+                "text-lg font-bold text-foreground",
                 isCancelled && "line-through opacity-70"
               )}>
                 {compromisso.hora}
               </span>
+              <span className="text-muted-foreground">•</span>
               <span className={cn(
-                "text-xs font-semibold px-2.5 py-1 rounded-full",
-                status.badgeColor
+                "text-sm font-medium text-muted-foreground truncate",
+                isCancelled && "line-through opacity-70"
               )}>
-                {status.label}
+                {config.label}
               </span>
             </div>
-            
-            {/* Type + Client */}
             <p className={cn(
-              "text-base font-medium text-foreground leading-tight",
+              "text-base font-medium text-foreground truncate",
               isCancelled && "line-through opacity-70"
             )}>
-              {config.label} - {compromisso.cliente}
+              {compromisso.cliente}
             </p>
-            
-            {/* Property */}
-            {compromisso.imovel && (
-              <p className="text-sm text-muted-foreground leading-tight">
-                {compromisso.imovel}
-              </p>
-            )}
-            
-            {/* Address */}
-            {compromisso.endereco && (
-              <div className="flex items-center gap-2 pt-1">
-                <div className="flex items-center gap-1.5 text-sm text-muted-foreground flex-1 min-w-0">
-                  <MapPin className="w-4 h-4 flex-shrink-0 opacity-70" />
-                  <span className="truncate">{compromisso.endereco}</span>
-                </div>
-                <button 
-                  onClick={handleNavigate}
-                  className="w-9 h-9 rounded-full bg-info/90 hover:bg-info flex items-center justify-center transition-colors flex-shrink-0 shadow-sm"
-                >
-                  <Navigation className="w-4 h-4 text-white" />
-                </button>
-              </div>
-            )}
           </div>
+          
+          {/* Status Badge */}
+          <span className={cn(
+            "text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0",
+            status.badgeColor
+          )}>
+            {status.label}
+          </span>
         </div>
-        
-        {isCompleted && (
-          <div className="absolute top-4 right-4">
-            <Check className="w-5 h-5 text-success" />
-          </div>
-        )}
       </div>
     </div>
   );
