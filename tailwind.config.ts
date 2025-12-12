@@ -71,6 +71,7 @@ export default {
         "2xl": "1.25rem",
       },
       boxShadow: {
+        device: '0 50px 100px -20px rgba(0, 0, 0, 0.25), 0 30px 60px -30px rgba(0, 0, 0, 0.3), inset 0 -1px 0 rgba(255, 255, 255, 0.1)',
         card: "var(--shadow-card)",
         elevated: "var(--shadow-elevated)",
       },
@@ -99,6 +100,10 @@ export default {
           from: { transform: "scale(0.95)", opacity: "0" },
           to: { transform: "scale(1)", opacity: "1" },
         },
+        "bounce-tab": {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.2)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -107,6 +112,7 @@ export default {
         "slide-down-sheet": "slide-down-sheet 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         "fade-in": "fade-in 0.2s ease-out",
         "scale-in": "scale-in 0.2s ease-out",
+        "bounce-tab": "bounce-tab 0.2s ease-out",
       },
       spacing: {
         'safe-bottom': 'env(safe-area-inset-bottom, 0px)',

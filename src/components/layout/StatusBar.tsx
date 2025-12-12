@@ -1,0 +1,30 @@
+import { useState, useEffect } from 'react';
+import { Signal, Wifi, Battery } from 'lucide-react';
+
+export const StatusBar = () => {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formattedTime = time.toLocaleTimeString('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+  return (
+    <div className="fixed top-0 left-0 right-0 h-[44px] flex items-end justify-between px-6 pb-1 z-50 pt-[14px]">
+      <span className="text-sm font-semibold text-foreground">
+        {formattedTime}
+      </span>
+      
+      <div className="flex items-center gap-1.5">
+        <Signal className="w-4 h-4 text-foreground" strokeWidth={2.5} />
+        <Wifi className="w-4 h-4 text-foreground" strokeWidth={2.5} />
+        <Battery className="w-5 h-5 text-foreground" strokeWidth={2.5} />
+      </div>
+    </div>
+  );
+};
