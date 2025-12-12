@@ -86,7 +86,7 @@ export const PerfilPage = () => {
   const totalReviews = 32;
 
   return (
-    <div className="min-h-screen bg-background content-safe">
+    <div className="bg-background pb-4">
       {/* Header */}
       <header className="px-4 pt-6 pb-4">
         <div className="flex flex-col items-center">
