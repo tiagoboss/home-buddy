@@ -1,9 +1,7 @@
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bell, UserPlus, Calendar, FileText, Target, Settings, Check, Trash2 } from 'lucide-react';
+import { Bell, UserPlus, Calendar, FileText, Target, Settings, Check, Trash2, X } from 'lucide-react';
 import { Notificacao } from '@/types';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 
 interface NotificationsSheetProps {
   open: boolean;
@@ -52,6 +50,9 @@ const formatTimeAgo = (dateStr: string): string => {
   return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
 };
 
+const DRAG_THRESHOLD = 100;
+const VELOCITY_THRESHOLD = 0.5;
+
 export const NotificationsSheet = ({
   open,
   onOpenChange,
@@ -60,34 +61,124 @@ export const NotificationsSheet = ({
   onMarkAllAsRead,
   onDelete,
 }: NotificationsSheetProps) => {
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isClosing, setIsClosing] = useState(false);
+  const dragStartY = useRef(0);
+  const dragStartTime = useRef(0);
+  const isDragging = useRef(false);
+
   const unreadCount = notifications.filter(n => !n.lida).length;
 
+  const handleClose = useCallback(() => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onOpenChange(false);
+      setDragOffset(0);
+      setIsClosing(false);
+    }, 200);
+  }, [onOpenChange]);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    dragStartY.current = e.touches[0].clientY;
+    dragStartTime.current = Date.now();
+    isDragging.current = true;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isDragging.current) return;
+    
+    const currentY = e.touches[0].clientY;
+    const diff = currentY - dragStartY.current;
+    
+    if (diff > 0) {
+      setDragOffset(diff);
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+
+    const elapsed = Date.now() - dragStartTime.current;
+    const velocity = dragOffset / elapsed;
+
+    if (dragOffset > DRAG_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
+      handleClose();
+    } else {
+      setDragOffset(0);
+    }
+  }, [dragOffset, handleClose]);
+
+  if (!open) return null;
+
+  const overlayOpacity = Math.max(0, 0.6 - (dragOffset / 500));
+
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-md p-0">
-        <SheetHeader className="p-4 border-b border-border">
-          <div className="flex items-center justify-between">
-            <SheetTitle className="flex items-center gap-2">
-              <Bell className="w-5 h-5" />
-              Notificações
-              {unreadCount > 0 && (
-                <span className="ml-1 px-2 py-0.5 text-xs font-medium bg-destructive text-destructive-foreground rounded-full">
-                  {unreadCount}
-                </span>
-              )}
-            </SheetTitle>
+    <>
+      {/* Overlay */}
+      <div 
+        className="absolute inset-0 bg-black z-50 animate-fade-in transition-opacity duration-200"
+        style={{ opacity: overlayOpacity }}
+        onClick={handleClose}
+      />
+      
+      {/* Bottom Sheet */}
+      <div 
+        className={cn(
+          "absolute bottom-0 left-0 right-0 z-50 bg-card rounded-t-3xl",
+          "max-h-[85%] flex flex-col touch-none",
+          !isClosing && dragOffset === 0 && "animate-slide-up-sheet",
+          isClosing && "transition-transform duration-200 ease-out"
+        )}
+        style={{ 
+          transform: isClosing 
+            ? 'translateY(100%)' 
+            : `translateY(${dragOffset}px)`,
+          transition: dragOffset === 0 && !isClosing ? 'transform 0.2s ease-out' : undefined
+        }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* Drag Handle */}
+        <div className="flex justify-center pt-3 pb-2 flex-shrink-0 cursor-grab active:cursor-grabbing">
+          <div className={cn(
+            "w-10 h-1 rounded-full bg-muted-foreground/30 transition-all",
+            dragOffset > 0 && "w-12 bg-muted-foreground/50"
+          )} />
+        </div>
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 pb-3 border-b border-border flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <Bell className="w-5 h-5 text-foreground" />
+            <h2 className="text-lg font-semibold text-foreground">Notificações</h2>
+            {unreadCount > 0 && (
+              <span className="px-2 py-0.5 text-xs font-medium bg-destructive text-destructive-foreground rounded-full">
+                {unreadCount}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
             {unreadCount > 0 && (
               <button
                 onClick={onMarkAllAsRead}
                 className="text-xs text-primary hover:underline"
               >
-                Marcar todas como lidas
+                Marcar todas
               </button>
             )}
+            <button
+              onClick={handleClose}
+              className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center"
+            >
+              <X className="w-4 h-4 text-muted-foreground" />
+            </button>
           </div>
-        </SheetHeader>
+        </div>
 
-        <ScrollArea className="h-[calc(100vh-80px)]">
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto">
           {notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 px-4">
               <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
@@ -132,14 +223,14 @@ export const NotificationsSheet = ({
                         {notification.mensagem}
                       </p>
                       
-                      <div className="flex items-center gap-2 mt-2">
+                      <div className="flex items-center gap-3 mt-2">
                         {!notification.lida && (
                           <button
                             onClick={() => onMarkAsRead(notification.id)}
                             className="flex items-center gap-1 text-xs text-primary hover:underline"
                           >
                             <Check className="w-3 h-3" />
-                            Marcar como lida
+                            Lida
                           </button>
                         )}
                         <button
@@ -156,8 +247,11 @@ export const NotificationsSheet = ({
               })}
             </div>
           )}
-        </ScrollArea>
-      </SheetContent>
-    </Sheet>
+        </div>
+
+        {/* Safe area padding */}
+        <div className="h-6 flex-shrink-0" />
+      </div>
+    </>
   );
 };
