@@ -326,12 +326,6 @@ export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite, onSched
               <Calendar className="w-5 h-5" />
               Agendar
             </button>
-            <button
-              onClick={handleNavigate}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-muted rounded-xl font-medium"
-            >
-              <Navigation className="w-5 h-5" />
-            </button>
           </div>
         </div>
       </div>
