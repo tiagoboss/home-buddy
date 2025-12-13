@@ -38,7 +38,10 @@ export const useImoveis = () => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchImoveis = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     try {
       setLoading(true);
