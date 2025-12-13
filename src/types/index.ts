@@ -50,4 +50,4 @@ export interface Imovel {
   baixouPreco?: boolean;
 }
 
-export type TabType = 'home' | 'leads' | 'novo' | 'agenda' | 'perfil';
+export type TabType = 'home' | 'leads' | 'imoveis' | 'agenda' | 'perfil';
