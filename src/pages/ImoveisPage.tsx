@@ -5,6 +5,7 @@ import { ImovelFilters } from '@/components/imoveis/ImovelFilters';
 import { SwipeableImovelCard } from '@/components/imoveis/SwipeableImovelCard';
 import { ImovelDetailSheet } from '@/components/imoveis/ImovelDetailSheet';
 import { ImoveisEmptyState } from '@/components/imoveis/ImoveisEmptyState';
+import { VisitaForm } from '@/components/forms/VisitaForm';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Imovel as ImovelType } from '@/types';
 
@@ -17,6 +18,8 @@ export const ImoveisPage = () => {
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [showFavorites, setShowFavorites] = useState(false);
   const [selectedImovel, setSelectedImovel] = useState<ImovelType | null>(null);
+  const [visitaFormOpen, setVisitaFormOpen] = useState(false);
+  const [visitaPrefillData, setVisitaPrefillData] = useState<{ imovel?: string; endereco?: string } | undefined>();
 
   // Use mock data if no db data
   const allImoveis: ImovelType[] = useMemo(() => {
@@ -121,8 +124,20 @@ export const ImoveisPage = () => {
   };
 
   const handleScheduleVisit = (imovel: ImovelType) => {
-    // TODO: Open visit form with pre-filled data
-    console.log('Schedule visit for:', imovel.titulo);
+    const endereco = imovel.bairro && imovel.cidade 
+      ? `${imovel.bairro}, ${imovel.cidade}` 
+      : imovel.bairro || imovel.cidade || '';
+    
+    setVisitaPrefillData({
+      imovel: imovel.titulo,
+      endereco: endereco,
+    });
+    setVisitaFormOpen(true);
+  };
+
+  const handleCloseVisitaForm = () => {
+    setVisitaFormOpen(false);
+    setVisitaPrefillData(undefined);
   };
 
   if (loading) {
@@ -187,8 +202,19 @@ export const ImoveisPage = () => {
           isOpen={!!selectedImovel}
           onClose={() => setSelectedImovel(null)}
           onFavorite={() => handleFavorite(selectedImovel)}
+          onScheduleVisit={() => {
+            setSelectedImovel(null);
+            handleScheduleVisit(selectedImovel);
+          }}
         />
       )}
+
+      {/* Visita Form */}
+      <VisitaForm
+        isOpen={visitaFormOpen}
+        onClose={handleCloseVisitaForm}
+        prefillData={visitaPrefillData}
+      />
     </div>
   );
 };

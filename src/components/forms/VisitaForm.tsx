@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -16,9 +16,13 @@ import { cn } from '@/lib/utils';
 interface VisitaFormProps {
   isOpen: boolean;
   onClose: () => void;
+  prefillData?: {
+    imovel?: string;
+    endereco?: string;
+  };
 }
 
-export const VisitaForm = ({ isOpen, onClose }: VisitaFormProps) => {
+export const VisitaForm = ({ isOpen, onClose, prefillData }: VisitaFormProps) => {
   const { createCompromisso } = useCompromissos();
   const { leads } = useLeads();
   const [loading, setLoading] = useState(false);
@@ -27,10 +31,21 @@ export const VisitaForm = ({ isOpen, onClose }: VisitaFormProps) => {
     tipo: 'visita' as 'visita' | 'reuniao' | 'ligacao',
     hora: '',
     cliente: '',
-    imovel: '',
-    endereco: '',
+    imovel: prefillData?.imovel || '',
+    endereco: prefillData?.endereco || '',
     lead_id: '',
   });
+
+  // Update form when prefillData changes
+  useEffect(() => {
+    if (prefillData) {
+      setFormData(prev => ({
+        ...prev,
+        imovel: prefillData.imovel || prev.imovel,
+        endereco: prefillData.endereco || prev.endereco,
+      }));
+    }
+  }, [prefillData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

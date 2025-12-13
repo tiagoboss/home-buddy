@@ -9,6 +9,7 @@ interface ImovelDetailSheetProps {
   isOpen: boolean;
   onClose: () => void;
   onFavorite: () => void;
+  onScheduleVisit?: () => void;
 }
 
 const formatCurrency = (value: number) => {
@@ -20,7 +21,7 @@ const formatCurrency = (value: number) => {
   }).format(value);
 };
 
-export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite }: ImovelDetailSheetProps) => {
+export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite, onScheduleVisit }: ImovelDetailSheetProps) => {
   const [translateY, setTranslateY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const startY = useRef(0);
@@ -291,7 +292,7 @@ export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite }: Imove
               Ligar
             </button>
             <button
-              onClick={() => {}}
+              onClick={onScheduleVisit}
               className="flex items-center justify-center gap-2 px-4 py-3 bg-muted rounded-xl font-medium"
             >
               <Calendar className="w-5 h-5" />
