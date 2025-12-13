@@ -18,7 +18,7 @@ export const FloatingActionButton = ({ onClick }: FloatingActionButtonProps) => 
       onMouseUp={() => setIsPressed(false)}
       onMouseLeave={() => setIsPressed(false)}
       className={cn(
-        "fixed bottom-24 right-6 w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-elevated z-50 transition-transform duration-150",
+        "absolute bottom-24 right-4 w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-elevated z-50 transition-transform duration-150",
         isPressed ? "scale-90" : "scale-100 active:scale-90"
       )}
     >
