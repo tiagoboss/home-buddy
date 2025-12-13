@@ -31,6 +31,7 @@ export const VisitaForm = ({ isOpen, onClose, prefillData }: VisitaFormProps) =>
     tipo: 'visita' as 'visita' | 'reuniao' | 'ligacao',
     hora: '',
     cliente: '',
+    telefone: '',
     imovel: prefillData?.imovel || '',
     endereco: prefillData?.endereco || '',
     lead_id: '',
@@ -72,7 +73,7 @@ export const VisitaForm = ({ isOpen, onClose, prefillData }: VisitaFormProps) =>
       if (error) throw error;
       
       toast.success('Visita agendada com sucesso!');
-      setFormData({ tipo: 'visita', hora: '', cliente: '', imovel: '', endereco: '', lead_id: '' });
+      setFormData({ tipo: 'visita', hora: '', cliente: '', telefone: '', imovel: '', endereco: '', lead_id: '' });
       setDate(undefined);
       onClose();
     } catch (err: any) {
@@ -174,7 +175,8 @@ export const VisitaForm = ({ isOpen, onClose, prefillData }: VisitaFormProps) =>
                     setFormData({ 
                       ...formData, 
                       lead_id: value,
-                      cliente: lead ? lead.nome : formData.cliente
+                      cliente: lead ? lead.nome : formData.cliente,
+                      telefone: lead?.telefone || formData.telefone
                     });
                   }}
                 >
@@ -201,6 +203,19 @@ export const VisitaForm = ({ isOpen, onClose, prefillData }: VisitaFormProps) =>
                 onChange={(e) => setFormData({ ...formData, cliente: e.target.value })}
                 className="h-12 rounded-xl"
                 maxLength={100}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="telefone">Telefone do Cliente</Label>
+              <Input
+                id="telefone"
+                type="tel"
+                placeholder="(11) 99999-9999"
+                value={formData.telefone}
+                onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
+                className="h-12 rounded-xl"
+                maxLength={20}
               />
             </div>
 
