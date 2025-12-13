@@ -3,6 +3,7 @@ import { X, MapPin, Bed, Bath, Car, Ruler, Building2, Heart, MessageCircle, Phon
 import { Imovel } from '@/types';
 import { ImovelModalidadeBadge } from './ImovelModalidadeBadge';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface ImovelDetailSheetProps {
   imovel: Imovel;
@@ -78,13 +79,33 @@ export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite, onSched
     window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`, '_blank');
   };
 
-  const handleShare = () => {
+  const handleShare = async () => {
+    const shareText = `Confira este imóvel: ${imovel.titulo} - ${formatCurrency(imovel.preco)}`;
+    
     if (navigator.share) {
-      navigator.share({
-        title: imovel.titulo,
-        text: `Confira este imóvel: ${imovel.titulo} - ${formatCurrency(imovel.preco)}`,
-        url: window.location.href,
-      });
+      try {
+        await navigator.share({
+          title: imovel.titulo,
+          text: shareText,
+          url: window.location.href,
+        });
+      } catch (err) {
+        // User cancelled or error - fallback to clipboard
+        if ((err as Error).name !== 'AbortError') {
+          await copyToClipboard(shareText);
+        }
+      }
+    } else {
+      await copyToClipboard(shareText);
+    }
+  };
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success('Copiado para a área de transferência!');
+    } catch {
+      toast.error('Não foi possível compartilhar');
     }
   };
 
