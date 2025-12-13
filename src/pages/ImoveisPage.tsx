@@ -146,14 +146,10 @@ export const ImoveisPage = () => {
     }
   };
 
-  const handleWhatsApp = (imovel: ImovelType) => {
-    const phone = imovel.telefoneContato?.replace(/\D/g, '');
-    const message = `Olá! Tenho interesse no imóvel: ${imovel.titulo}`;
-    if (phone) {
-      window.open(`https://wa.me/55${phone}?text=${encodeURIComponent(message)}`, '_blank');
-    } else {
-      window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
-    }
+  const handleSendToClient = (imovel: ImovelType) => {
+    const formatCurrency = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 }).format(value);
+    const message = `🏠 *${imovel.titulo}*\n\n📍 ${imovel.bairro}, ${imovel.cidade}\n💰 ${formatCurrency(imovel.preco)}${imovel.modalidade === 'locacao' ? '/mês' : imovel.modalidade === 'temporada' ? '/diária' : ''}\n\n🛏️ ${imovel.quartos} quartos | 🚿 ${imovel.banheiros} banheiros | 🚗 ${imovel.vagas} vagas | 📐 ${imovel.area}m²${imovel.descricao ? `\n\n${imovel.descricao}` : ''}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   const handleScheduleVisit = (imovel: ImovelType) => {
@@ -235,7 +231,7 @@ export const ImoveisPage = () => {
               imovel={imovel}
               onClick={() => setSelectedImovel(imovel)}
               onFavorite={() => handleFavorite(imovel)}
-              onWhatsApp={() => handleWhatsApp(imovel)}
+              onSendToClient={() => handleSendToClient(imovel)}
               onScheduleVisit={() => handleScheduleVisit(imovel)}
               viewMode={viewMode}
             />
