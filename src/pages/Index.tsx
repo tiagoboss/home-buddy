@@ -16,10 +16,10 @@ import { VisitaForm } from '@/components/forms/VisitaForm';
 import { ImovelForm } from '@/components/forms/ImovelForm';
 import { LigacaoForm } from '@/components/forms/LigacaoForm';
 import { PropostaForm } from '@/components/forms/PropostaForm';
+import { CheckinForm } from '@/components/forms/CheckinForm';
 import { NotificationsSheet } from '@/components/notifications/NotificationsSheet';
 import { TabType, Notificacao } from '@/types';
 import { notificacoes as initialNotificacoes } from '@/data/mockData';
-import { toast } from 'sonner';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<TabType>('home');
@@ -45,10 +45,6 @@ const Index = () => {
   };
 
   const handleActionSelect = (action: QuickActionType) => {
-    if (action === 'checkin') {
-      toast.info('Check-in de Visita em breve!');
-      return;
-    }
     setActiveForm(action);
   };
   
@@ -149,6 +145,10 @@ const Index = () => {
         />
         <PropostaForm 
           isOpen={activeForm === 'proposta'} 
+          onClose={() => setActiveForm(null)} 
+        />
+        <CheckinForm 
+          isOpen={activeForm === 'checkin'} 
           onClose={() => setActiveForm(null)} 
         />
       </div>

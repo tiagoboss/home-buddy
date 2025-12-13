@@ -91,3 +91,15 @@ export interface Proposta {
   created_at: string;
   updated_at: string;
 }
+
+export interface Checkin {
+  id: string;
+  user_id: string;
+  compromisso_id: string;
+  latitude: number | null;
+  longitude: number | null;
+  endereco_confirmado: string | null;
+  observacoes: string | null;
+  foto_url: string | null;
+  created_at: string;
+}
