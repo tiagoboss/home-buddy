@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { X, MapPin, Bed, Bath, Car, Ruler, Building2, Heart, MessageCircle, Phone, Calendar, Navigation, Share2 } from 'lucide-react';
+import { X, MapPin, Bed, Bath, Car, Ruler, Building2, Heart, MessageCircle, Phone, Calendar, Navigation, Share2, Pencil } from 'lucide-react';
 import { Imovel } from '@/types';
 import { ImovelModalidadeBadge } from './ImovelModalidadeBadge';
 import { cn } from '@/lib/utils';
@@ -10,6 +10,7 @@ interface ImovelDetailSheetProps {
   onClose: () => void;
   onFavorite: () => void;
   onScheduleVisit?: () => void;
+  onEdit?: () => void;
 }
 
 const formatCurrency = (value: number) => {
@@ -21,7 +22,7 @@ const formatCurrency = (value: number) => {
   }).format(value);
 };
 
-export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite, onScheduleVisit }: ImovelDetailSheetProps) => {
+export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite, onScheduleVisit, onEdit }: ImovelDetailSheetProps) => {
   const [translateY, setTranslateY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const startY = useRef(0);
@@ -49,13 +50,27 @@ export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite, onSched
     setTranslateY(0);
   };
 
+  const getPhoneNumber = () => {
+    const phone = imovel.telefoneContato;
+    if (!phone) return null;
+    return phone.replace(/\D/g, '');
+  };
+
   const handleWhatsApp = () => {
+    const phone = getPhoneNumber();
     const message = `Olá! Tenho interesse no imóvel: ${imovel.titulo} - ${formatCurrency(imovel.preco)}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+    if (phone) {
+      window.open(`https://wa.me/55${phone}?text=${encodeURIComponent(message)}`, '_blank');
+    } else {
+      window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+    }
   };
 
   const handleCall = () => {
-    window.open('tel:+5511999999999', '_blank');
+    const phone = getPhoneNumber();
+    if (phone) {
+      window.open(`tel:+55${phone}`, '_blank');
+    }
   };
 
   const handleNavigate = () => {
@@ -116,6 +131,8 @@ export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite, onSched
 
   if (!isOpen) return null;
 
+  const hasPhone = !!getPhoneNumber();
+
   return (
     <div className="absolute inset-0 z-50 flex flex-col">
       {/* Overlay */}
@@ -159,6 +176,14 @@ export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite, onSched
               <X className="w-5 h-5" />
             </button>
             <div className="absolute top-4 right-4 flex gap-2">
+              {onEdit && (
+                <button
+                  onClick={onEdit}
+                  className="p-2 bg-background/80 backdrop-blur-sm rounded-full"
+                >
+                  <Pencil className="w-5 h-5" />
+                </button>
+              )}
               <button
                 onClick={handleShare}
                 className="p-2 bg-background/80 backdrop-blur-sm rounded-full"
@@ -286,7 +311,13 @@ export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite, onSched
             </button>
             <button
               onClick={handleCall}
-              className="flex-1 flex items-center justify-center gap-2 py-3 bg-primary text-primary-foreground rounded-xl font-medium"
+              disabled={!hasPhone}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-medium",
+                hasPhone 
+                  ? "bg-primary text-primary-foreground" 
+                  : "bg-muted text-muted-foreground cursor-not-allowed"
+              )}
             >
               <Phone className="w-5 h-5" />
               Ligar

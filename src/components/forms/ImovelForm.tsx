@@ -1,20 +1,34 @@
-import { useState } from 'react';
-import { X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useImoveis } from '@/hooks/useImoveis';
+import { useImoveis, Imovel } from '@/hooks/useImoveis';
 import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface ImovelFormProps {
   isOpen: boolean;
   onClose: () => void;
+  editData?: Imovel | null;
+  onDeleted?: () => void;
 }
 
-export const ImovelForm = ({ isOpen, onClose }: ImovelFormProps) => {
-  const { createImovel } = useImoveis();
+export const ImovelForm = ({ isOpen, onClose, editData, onDeleted }: ImovelFormProps) => {
+  const { createImovel, updateImovel, deleteImovel } = useImoveis();
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [formData, setFormData] = useState<{
     titulo: string;
     tipo: string;
@@ -28,6 +42,7 @@ export const ImovelForm = ({ isOpen, onClose }: ImovelFormProps) => {
     area: string;
     condominio: string;
     foto: string;
+    telefoneContato: string;
   }>({
     titulo: '',
     tipo: '',
@@ -41,7 +56,46 @@ export const ImovelForm = ({ isOpen, onClose }: ImovelFormProps) => {
     area: '',
     condominio: '',
     foto: '',
+    telefoneContato: '',
   });
+
+  const isEditMode = !!editData;
+
+  useEffect(() => {
+    if (editData) {
+      setFormData({
+        titulo: editData.titulo,
+        tipo: editData.tipo,
+        modalidade: editData.modalidade,
+        preco: editData.preco.toString(),
+        bairro: editData.bairro || '',
+        cidade: editData.cidade || '',
+        quartos: editData.quartos.toString(),
+        banheiros: editData.banheiros.toString(),
+        vagas: editData.vagas.toString(),
+        area: editData.area.toString(),
+        condominio: editData.condominio?.toString() || '',
+        foto: editData.foto || '',
+        telefoneContato: editData.telefone_contato || '',
+      });
+    } else {
+      setFormData({
+        titulo: '',
+        tipo: '',
+        modalidade: 'venda',
+        preco: '',
+        bairro: '',
+        cidade: '',
+        quartos: '',
+        banheiros: '',
+        vagas: '',
+        area: '',
+        condominio: '',
+        foto: '',
+        telefoneContato: '',
+      });
+    }
+  }, [editData, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +113,7 @@ export const ImovelForm = ({ isOpen, onClose }: ImovelFormProps) => {
 
     setLoading(true);
     try {
-      const { error } = await createImovel({
+      const imovelData = {
         titulo: formData.titulo.trim(),
         tipo: formData.tipo,
         modalidade: formData.modalidade,
@@ -77,20 +131,44 @@ export const ImovelForm = ({ isOpen, onClose }: ImovelFormProps) => {
         entrega: null,
         construtora: null,
         foto: formData.foto || null,
-        novo: true,
+        novo: !isEditMode,
         baixou_preco: false,
-        favorito: false,
-      });
+        favorito: editData?.favorito || false,
+        telefone_contato: formData.telefoneContato || null,
+      };
 
-      if (error) throw error;
+      if (isEditMode && editData) {
+        const { error } = await updateImovel(editData.id, imovelData);
+        if (error) throw error;
+        toast.success('Imóvel atualizado com sucesso!');
+      } else {
+        const { error } = await createImovel(imovelData);
+        if (error) throw error;
+        toast.success('Imóvel cadastrado com sucesso!');
+      }
       
-      toast.success('Imóvel cadastrado com sucesso!');
-      setFormData({ titulo: '', tipo: '', modalidade: 'venda', preco: '', bairro: '', cidade: '', quartos: '', banheiros: '', vagas: '', area: '', condominio: '', foto: '' });
       onClose();
     } catch (err: any) {
-      toast.error(err.message || 'Erro ao cadastrar imóvel');
+      toast.error(err.message || `Erro ao ${isEditMode ? 'atualizar' : 'cadastrar'} imóvel`);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!editData) return;
+    
+    setDeleting(true);
+    try {
+      const { error } = await deleteImovel(editData.id);
+      if (error) throw error;
+      toast.success('Imóvel excluído com sucesso!');
+      onDeleted?.();
+      onClose();
+    } catch (err: any) {
+      toast.error(err.message || 'Erro ao excluir imóvel');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -102,6 +180,13 @@ export const ImovelForm = ({ isOpen, onClose }: ImovelFormProps) => {
       minimumFractionDigits: 0,
     }).format(parseInt(number) || 0);
     return formatted;
+  };
+
+  const formatPhone = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 2) return `(${numbers}`;
+    if (numbers.length <= 7) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
   };
 
   if (!isOpen) return null;
@@ -120,13 +205,43 @@ export const ImovelForm = ({ isOpen, onClose }: ImovelFormProps) => {
           </div>
           
           <div className="flex items-center justify-between px-5 pb-4 sticky top-5 bg-card">
-            <h2 className="text-lg font-semibold text-foreground">Capturar Imóvel</h2>
-            <button 
-              onClick={onClose}
-              className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center"
-            >
-              <X className="w-4 h-4 text-muted-foreground" />
-            </button>
+            <h2 className="text-lg font-semibold text-foreground">
+              {isEditMode ? 'Editar Imóvel' : 'Capturar Imóvel'}
+            </h2>
+            <div className="flex items-center gap-2">
+              {isEditMode && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button 
+                      className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center"
+                      disabled={deleting}
+                    >
+                      <Trash2 className="w-4 h-4 text-destructive" />
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Excluir imóvel?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Esta ação não pode ser desfeita. O imóvel será permanentemente removido.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+                        {deleting ? 'Excluindo...' : 'Excluir'}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+              <button 
+                onClick={onClose}
+                className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center"
+              >
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+            </div>
           </div>
           
           <form onSubmit={handleSubmit} className="px-5 pb-8 space-y-4">
@@ -287,6 +402,19 @@ export const ImovelForm = ({ isOpen, onClose }: ImovelFormProps) => {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="telefoneContato">Telefone de Contato</Label>
+              <Input
+                id="telefoneContato"
+                type="tel"
+                placeholder="(11) 99999-9999"
+                value={formData.telefoneContato}
+                onChange={(e) => setFormData({ ...formData, telefoneContato: formatPhone(e.target.value) })}
+                className="h-12 rounded-xl"
+                maxLength={15}
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="foto">URL da Foto</Label>
               <Input
                 id="foto"
@@ -304,7 +432,7 @@ export const ImovelForm = ({ isOpen, onClose }: ImovelFormProps) => {
               className="w-full h-12 rounded-xl mt-6"
               disabled={loading}
             >
-              {loading ? 'Salvando...' : 'Cadastrar Imóvel'}
+              {loading ? 'Salvando...' : isEditMode ? 'Salvar Alterações' : 'Cadastrar Imóvel'}
             </Button>
           </form>
           

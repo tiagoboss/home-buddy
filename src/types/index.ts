@@ -60,6 +60,7 @@ export interface Imovel {
   novo?: boolean;
   baixouPreco?: boolean;
   favorito?: boolean;
+  telefoneContato?: string;
 }
 
 export type TabType = 'home' | 'leads' | 'imoveis' | 'agenda' | 'perfil';

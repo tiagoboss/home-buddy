@@ -141,6 +141,7 @@ export const imoveis: Imovel[] = [
     caracteristicas: ["Varanda Gourmet", "Vista Livre", "Piso Porcelanato", "Ar Condicionado"],
     foto: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop",
     novo: true,
+    telefoneContato: "(11) 99999-1111",
   },
   {
     id: "2",
@@ -159,6 +160,7 @@ export const imoveis: Imovel[] = [
     caracteristicas: ["Piscina", "Churrasqueira", "Jardim", "Escritório", "Suíte Master"],
     foto: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=300&fit=crop",
     baixouPreco: true,
+    telefoneContato: "(11) 99999-2222",
   },
   {
     id: "3",
@@ -177,6 +179,7 @@ export const imoveis: Imovel[] = [
     caracteristicas: ["Mobiliado", "Próximo ao Metrô", "Academia no Prédio"],
     foto: "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
     novo: true,
+    telefoneContato: "(11) 99999-3333",
   },
   {
     id: "4",
@@ -195,6 +198,7 @@ export const imoveis: Imovel[] = [
     descricao: "Cobertura duplex com terraço, piscina privativa e vista panorâmica.",
     caracteristicas: ["Piscina Privativa", "Terraço", "Vista Panorâmica", "Home Theater", "Lareira"],
     foto: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=300&fit=crop",
+    telefoneContato: "(11) 99999-4444",
   },
   {
     id: "5",
@@ -214,6 +218,7 @@ export const imoveis: Imovel[] = [
     caracteristicas: ["Lazer Completo", "Próximo ao Metrô", "Rooftop", "Coworking"],
     foto: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&h=300&fit=crop",
     novo: true,
+    telefoneContato: "(11) 99999-5555",
   },
   {
     id: "6",
@@ -230,6 +235,7 @@ export const imoveis: Imovel[] = [
     descricao: "Casa aconchegante na praia, perfeita para férias em família.",
     caracteristicas: ["Churrasqueira", "Próximo à Praia", "Wi-Fi", "TV a Cabo"],
     foto: "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=400&h=300&fit=crop",
+    telefoneContato: "(11) 99999-6666",
   },
 ];
 
