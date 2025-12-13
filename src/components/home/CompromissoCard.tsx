@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 
 interface CompromissoCardProps {
   compromisso: Compromisso;
+  onClick?: () => void;
 }
 
 const tipoIcons = {
@@ -18,11 +19,11 @@ const tipoLabels = {
   reuniao: 'Reunião',
 };
 
-export const CompromissoCard = ({ compromisso }: CompromissoCardProps) => {
+export const CompromissoCard = ({ compromisso, onClick }: CompromissoCardProps) => {
   const Icon = tipoIcons[compromisso.tipo];
   
   return (
-    <div className="ios-list-item animate-scale-press group">
+    <div className="ios-list-item animate-scale-press group cursor-pointer" onClick={onClick}>
       <div className="flex items-start gap-3 flex-1 min-w-0">
         <div className={cn(
           "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0",

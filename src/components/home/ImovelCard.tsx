@@ -5,11 +5,12 @@ import { Bed, Maximize2 } from 'lucide-react';
 
 interface ImovelCardProps {
   imovel: Imovel;
+  onClick?: () => void;
 }
 
-export const ImovelCard = ({ imovel }: ImovelCardProps) => {
+export const ImovelCard = ({ imovel, onClick }: ImovelCardProps) => {
   return (
-    <div className="flex-shrink-0 w-[160px] ios-card overflow-hidden animate-scale-press snap-start">
+    <div className="flex-shrink-0 w-[160px] ios-card overflow-hidden animate-scale-press snap-start cursor-pointer" onClick={onClick}>
       <div className="relative">
         <img 
           src={imovel.foto} 

@@ -58,7 +58,7 @@ const Index = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
-        return <HomePage />;
+        return <HomePage onTabChange={setActiveTab} />;
       case 'leads':
         return (
           <LeadsPage 
