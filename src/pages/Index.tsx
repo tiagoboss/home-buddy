@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { TabBar } from '@/components/layout/TabBar';
+import { FloatingActionButton } from '@/components/layout/FloatingActionButton';
 import { QuickActionsSheet, QuickActionType } from '@/components/sheets/QuickActionsSheet';
 import { DeviceFrame } from '@/components/layout/DeviceFrame';
 import { StatusBar } from '@/components/layout/StatusBar';
@@ -7,6 +8,7 @@ import { HomeIndicator } from '@/components/layout/HomeIndicator';
 import { Header } from '@/components/layout/Header';
 import { HomePage } from '@/pages/HomePage';
 import { LeadsPage } from '@/pages/LeadsPage';
+import { ImoveisPage } from '@/pages/ImoveisPage';
 import { AgendaPage } from '@/pages/AgendaPage';
 import { PerfilPage } from '@/pages/PerfilPage';
 import { LeadForm } from '@/components/forms/LeadForm';
@@ -44,6 +46,8 @@ const Index = () => {
             onScheduleVisit={() => setActiveForm('visita')}
           />
         );
+      case 'imoveis':
+        return <ImoveisPage />;
       case 'agenda':
         return <AgendaPage />;
       case 'perfil':
@@ -77,11 +81,13 @@ const Index = () => {
           </div>
         </div>
         
+        {/* Floating Action Button */}
+        <FloatingActionButton onClick={() => setIsQuickActionsOpen(true)} />
+        
         {/* Fixed Bottom Elements */}
         <TabBar 
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          onNewAction={() => setIsQuickActionsOpen(true)}
         />
         
         <HomeIndicator />
