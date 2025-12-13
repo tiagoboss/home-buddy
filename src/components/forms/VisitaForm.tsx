@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { TimePicker } from '@/components/ui/TimePicker';
 import { useCompromissos } from '@/hooks/useCompromissos';
 import { useLeads } from '@/hooks/useLeads';
 import { toast } from 'sonner';
@@ -245,13 +246,12 @@ export const VisitaForm = ({ isOpen, onClose, prefillData }: VisitaFormProps) =>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="hora">Hora *</Label>
-              <Input
-                id="hora"
-                type="time"
+              <Label>Hora *</Label>
+              <TimePicker
                 value={formData.hora}
-                onChange={(e) => handleFieldChange('hora', e.target.value)}
-                className={cn("h-12 rounded-xl", errors.hora && "border-destructive")}
+                onChange={(value) => handleFieldChange('hora', value)}
+                placeholder="Selecione o horário"
+                hasError={!!errors.hora}
               />
               {errors.hora && <p className="text-xs text-destructive">{errors.hora}</p>}
             </div>
