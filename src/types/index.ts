@@ -36,18 +36,30 @@ export interface Compromisso {
   status: 'pendente' | 'confirmado' | 'cancelado' | 'realizado';
 }
 
+export type Modalidade = 'venda' | 'locacao' | 'lancamento' | 'temporada';
+
 export interface Imovel {
   id: string;
   titulo: string;
   tipo: string;
+  modalidade: Modalidade;
   preco: number;
   bairro: string;
   cidade: string;
   quartos: number;
+  banheiros: number;
+  vagas: number;
   area: number;
   foto: string;
+  condominio?: number;
+  iptu?: number;
+  descricao?: string;
+  caracteristicas?: string[];
+  entrega?: string;
+  construtora?: string;
   novo?: boolean;
   baixouPreco?: boolean;
+  favorito?: boolean;
 }
 
 export type TabType = 'home' | 'leads' | 'imoveis' | 'agenda' | 'perfil';

@@ -2,19 +2,31 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
+export type Modalidade = 'venda' | 'locacao' | 'lancamento' | 'temporada';
+
 export interface Imovel {
   id: string;
   user_id: string;
   titulo: string;
   tipo: string;
+  modalidade: Modalidade;
   preco: number;
   bairro: string | null;
   cidade: string | null;
   quartos: number;
+  banheiros: number;
+  vagas: number;
   area: number;
+  condominio: number | null;
+  iptu: number | null;
+  descricao: string | null;
+  caracteristicas: string[] | null;
+  entrega: string | null;
+  construtora: string | null;
   foto: string | null;
   novo: boolean;
   baixou_preco: boolean;
+  favorito: boolean;
   created_at: string;
   updated_at: string;
 }
