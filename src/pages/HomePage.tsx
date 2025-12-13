@@ -1,14 +1,49 @@
+import { useState } from 'react';
 import { DollarSign, TrendingUp, Target, Clock, ChevronRight } from 'lucide-react';
 import { KPICard } from '@/components/ui/KPICard';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { CompromissoCard } from '@/components/home/CompromissoCard';
 import { LeadCard } from '@/components/home/LeadCard';
 import { ImovelCard } from '@/components/home/ImovelCard';
+import { CompromissoDetailSheet } from '@/components/agenda/CompromissoDetailSheet';
+import { LeadDetailSheet } from '@/components/leads/LeadDetailSheet';
+import { ImovelDetailSheet } from '@/components/imoveis/ImovelDetailSheet';
 import { corretor, compromissos, leads, imoveis } from '@/data/mockData';
+import { Compromisso as MockCompromisso, Lead as MockLead, Imovel, TabType } from '@/types';
+import { Compromisso as HookCompromisso } from '@/hooks/useCompromissos';
+import { useFavoritos } from '@/hooks/useFavoritos';
 
-export const HomePage = () => {
+interface HomePageProps {
+  onTabChange?: (tab: TabType) => void;
+}
+
+export const HomePage = ({ onTabChange }: HomePageProps) => {
   const hotLeads = leads.filter(l => l.status === 'quente' || l.status === 'negociacao');
   const todayCompromissos = compromissos.slice(0, 3);
+  
+  // Selected items for detail sheets
+  const [selectedCompromisso, setSelectedCompromisso] = useState<MockCompromisso | null>(null);
+  const [selectedLead, setSelectedLead] = useState<MockLead | null>(null);
+  const [selectedImovel, setSelectedImovel] = useState<Imovel | null>(null);
+  
+  // Convert mock compromisso to hook format
+  const convertToHookCompromisso = (c: MockCompromisso): HookCompromisso => ({
+    id: c.id,
+    user_id: '',
+    tipo: c.tipo,
+    data: c.data,
+    hora: c.hora,
+    cliente: c.cliente,
+    imovel: c.imovel || null,
+    endereco: c.endereco || null,
+    status: c.status,
+    lead_id: null,
+    lead: null,
+    created_at: c.data,
+    updated_at: c.data,
+  });
+  
+  const { isFavorito, toggleFavorito } = useFavoritos();
   
   return (
     <div className="bg-background">
@@ -55,14 +90,21 @@ export const HomePage = () => {
         <section className="px-4">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Próximos Compromissos</h2>
-            <button className="flex items-center gap-0.5 text-xs text-primary font-medium animate-scale-press">
+            <button 
+              onClick={() => onTabChange?.('agenda')}
+              className="flex items-center gap-0.5 text-xs text-primary font-medium animate-scale-press"
+            >
               Ver todos
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
           <div className="ios-section">
             {todayCompromissos.map((c) => (
-              <CompromissoCard key={c.id} compromisso={c} />
+              <CompromissoCard 
+                key={c.id} 
+                compromisso={c} 
+                onClick={() => setSelectedCompromisso(c)}
+              />
             ))}
           </div>
         </section>
@@ -71,14 +113,22 @@ export const HomePage = () => {
         <section className="px-4">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Leads Quentes</h2>
-            <button className="flex items-center gap-0.5 text-xs text-primary font-medium animate-scale-press">
+            <button 
+              onClick={() => onTabChange?.('leads')}
+              className="flex items-center gap-0.5 text-xs text-primary font-medium animate-scale-press"
+            >
               Ver todos
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
           <div className="flex gap-2.5 overflow-x-auto pb-2 hide-scrollbar snap-x-mandatory scroll-pl-0 -mr-4 pr-4">
             {hotLeads.map((lead) => (
-              <LeadCard key={lead.id} lead={lead} compact />
+              <LeadCard 
+                key={lead.id} 
+                lead={lead} 
+                compact 
+                onClick={() => setSelectedLead(lead)}
+              />
             ))}
           </div>
         </section>
@@ -87,18 +137,66 @@ export const HomePage = () => {
         <section className="px-4">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Imóveis em Destaque</h2>
-            <button className="flex items-center gap-0.5 text-xs text-primary font-medium animate-scale-press">
+            <button 
+              onClick={() => onTabChange?.('imoveis')}
+              className="flex items-center gap-0.5 text-xs text-primary font-medium animate-scale-press"
+            >
               Ver todos
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
           <div className="flex gap-2.5 overflow-x-auto pb-2 hide-scrollbar snap-x-mandatory scroll-pl-0 -mr-4 pr-4">
             {imoveis.map((imovel) => (
-              <ImovelCard key={imovel.id} imovel={imovel} />
+              <ImovelCard 
+                key={imovel.id} 
+                imovel={imovel} 
+                onClick={() => setSelectedImovel(imovel)}
+              />
             ))}
           </div>
         </section>
       </main>
+      
+      {/* Detail Sheets */}
+      <CompromissoDetailSheet
+        compromisso={selectedCompromisso ? convertToHookCompromisso(selectedCompromisso) : null}
+        isOpen={!!selectedCompromisso}
+        onClose={() => setSelectedCompromisso(null)}
+      />
+      
+      {selectedLead && (
+        <LeadDetailSheet
+          lead={{
+            id: selectedLead.id,
+            user_id: '',
+            nome: selectedLead.nome,
+            telefone: selectedLead.telefone,
+            email: selectedLead.email || null,
+            status: selectedLead.status as any,
+            interesse: selectedLead.interesse,
+            faixa_preco: null,
+            bairros: null,
+            ultimo_contato: selectedLead.ultimoContato,
+            avatar: selectedLead.avatar,
+            created_at: selectedLead.ultimoContato,
+            updated_at: selectedLead.ultimoContato,
+          }}
+          isOpen={!!selectedLead}
+          onClose={() => setSelectedLead(null)}
+        />
+      )}
+      
+      {selectedImovel && (
+        <ImovelDetailSheet
+          imovel={{
+            ...selectedImovel,
+            favorito: isFavorito(selectedImovel.id),
+          }}
+          isOpen={!!selectedImovel}
+          onClose={() => setSelectedImovel(null)}
+          onFavorite={() => toggleFavorito(selectedImovel.id)}
+        />
+      )}
     </div>
   );
 };
