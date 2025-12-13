@@ -82,7 +82,7 @@ const Index = () => {
         </div>
         
         {/* Floating Action Button */}
-        <FloatingActionButton onClick={() => setIsQuickActionsOpen(true)} />
+        <FloatingActionButton onClick={() => setIsQuickActionsOpen(true)} isOpen={isQuickActionsOpen} />
         
         {/* Fixed Bottom Elements */}
         <TabBar 
