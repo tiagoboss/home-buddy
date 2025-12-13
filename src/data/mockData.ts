@@ -1,4 +1,4 @@
-import { Corretor, Lead, Compromisso, Imovel } from '@/types';
+import { Corretor, Lead, Compromisso, Imovel, Notificacao } from '@/types';
 
 export const corretor: Corretor = {
   id: "1",
@@ -236,6 +236,49 @@ export const imoveis: Imovel[] = [
     caracteristicas: ["Churrasqueira", "Próximo à Praia", "Wi-Fi", "TV a Cabo"],
     foto: "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=400&h=300&fit=crop",
     telefoneContato: "(11) 99999-6666",
+  },
+];
+
+export const notificacoes: Notificacao[] = [
+  {
+    id: "1",
+    tipo: "lead",
+    titulo: "Novo lead atribuído",
+    mensagem: "Ana Paula Costa foi atribuída a você. Interesse em Studio ou 1 quarto.",
+    lida: false,
+    data: new Date(Date.now() - 15 * 60000).toISOString(),
+  },
+  {
+    id: "2",
+    tipo: "visita",
+    titulo: "Lembrete de visita",
+    mensagem: "Visita com Maria Santos às 09:00 no Apt 3q Jardins.",
+    lida: false,
+    data: new Date(Date.now() - 30 * 60000).toISOString(),
+  },
+  {
+    id: "3",
+    tipo: "proposta",
+    titulo: "Proposta aceita!",
+    mensagem: "Carlos Oliveira aceitou sua proposta para Casa com Jardim no Morumbi.",
+    lida: false,
+    data: new Date(Date.now() - 2 * 3600000).toISOString(),
+  },
+  {
+    id: "4",
+    tipo: "meta",
+    titulo: "80% da meta atingida",
+    mensagem: "Parabéns! Você está a 3 vendas de bater sua meta mensal.",
+    lida: true,
+    data: new Date(Date.now() - 24 * 3600000).toISOString(),
+  },
+  {
+    id: "5",
+    tipo: "sistema",
+    titulo: "Atualização do sistema",
+    mensagem: "Nova versão do app disponível com melhorias de desempenho.",
+    lida: true,
+    data: new Date(Date.now() - 48 * 3600000).toISOString(),
   },
 ];
 
