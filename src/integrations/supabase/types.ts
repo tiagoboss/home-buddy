@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      checkins: {
+        Row: {
+          compromisso_id: string
+          created_at: string | null
+          endereco_confirmado: string | null
+          foto_url: string | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          observacoes: string | null
+          user_id: string
+        }
+        Insert: {
+          compromisso_id: string
+          created_at?: string | null
+          endereco_confirmado?: string | null
+          foto_url?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          observacoes?: string | null
+          user_id: string
+        }
+        Update: {
+          compromisso_id?: string
+          created_at?: string | null
+          endereco_confirmado?: string | null
+          foto_url?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          observacoes?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checkins_compromisso_id_fkey"
+            columns: ["compromisso_id"]
+            isOneToOne: false
+            referencedRelation: "compromissos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       compromissos: {
         Row: {
           cliente: string
