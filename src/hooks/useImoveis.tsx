@@ -27,6 +27,7 @@ export interface Imovel {
   novo: boolean;
   baixou_preco: boolean;
   favorito: boolean;
+  telefone_contato: string | null;
   created_at: string;
   updated_at: string;
 }

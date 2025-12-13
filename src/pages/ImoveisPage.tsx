@@ -1,16 +1,22 @@
 import { useState, useMemo } from 'react';
-import { useImoveis, Imovel, Modalidade } from '@/hooks/useImoveis';
+import { useImoveis, Imovel as DbImovel, Modalidade } from '@/hooks/useImoveis';
+import { useFavoritos } from '@/hooks/useFavoritos';
 import { imoveis as mockImoveis } from '@/data/mockData';
 import { ImovelFilters } from '@/components/imoveis/ImovelFilters';
 import { SwipeableImovelCard } from '@/components/imoveis/SwipeableImovelCard';
 import { ImovelDetailSheet } from '@/components/imoveis/ImovelDetailSheet';
 import { ImoveisEmptyState } from '@/components/imoveis/ImoveisEmptyState';
 import { VisitaForm } from '@/components/forms/VisitaForm';
+import { ImovelForm } from '@/components/forms/ImovelForm';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Imovel as ImovelType } from '@/types';
+import { useAuth } from '@/hooks/useAuth';
 
 export const ImoveisPage = () => {
+  const { user } = useAuth();
   const { imoveis: dbImoveis, loading, updateImovel } = useImoveis();
+  const { isFavorito, toggleFavorito } = useFavoritos();
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedModalidade, setSelectedModalidade] = useState<Modalidade | 'todos'>('todos');
   const [selectedTipo, setSelectedTipo] = useState('Todos');
@@ -18,12 +24,20 @@ export const ImoveisPage = () => {
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [showFavorites, setShowFavorites] = useState(false);
   const [selectedImovel, setSelectedImovel] = useState<ImovelType | null>(null);
+  
+  // Visita form state
   const [visitaFormOpen, setVisitaFormOpen] = useState(false);
   const [visitaPrefillData, setVisitaPrefillData] = useState<{ imovel?: string; endereco?: string } | undefined>();
+  
+  // Edit form state
+  const [editFormOpen, setEditFormOpen] = useState(false);
+  const [editImovelData, setEditImovelData] = useState<DbImovel | null>(null);
+
+  const isUsingMockData = dbImoveis.length === 0;
 
   // Use mock data if no db data
   const allImoveis: ImovelType[] = useMemo(() => {
-    if (dbImoveis.length > 0) {
+    if (!isUsingMockData) {
       return dbImoveis.map(i => ({
         id: i.id,
         titulo: i.titulo,
@@ -46,10 +60,15 @@ export const ImoveisPage = () => {
         novo: i.novo,
         baixouPreco: i.baixou_preco,
         favorito: i.favorito,
+        telefoneContato: i.telefone_contato || undefined,
       }));
     }
-    return mockImoveis;
-  }, [dbImoveis]);
+    // Apply localStorage favorites to mock data
+    return mockImoveis.map(i => ({
+      ...i,
+      favorito: isFavorito(i.id),
+    }));
+  }, [dbImoveis, isUsingMockData, isFavorito]);
 
   // Calculate counts
   const counts = useMemo(() => {
@@ -113,14 +132,28 @@ export const ImoveisPage = () => {
   }, [allImoveis, searchQuery, selectedModalidade, selectedTipo, sortBy, showFavorites]);
 
   const handleFavorite = async (imovel: ImovelType) => {
-    if (dbImoveis.length > 0) {
+    if (isUsingMockData) {
+      toggleFavorito(imovel.id);
+      // Update selected imovel if it's the same
+      if (selectedImovel?.id === imovel.id) {
+        setSelectedImovel({ ...imovel, favorito: !imovel.favorito });
+      }
+    } else {
       await updateImovel(imovel.id, { favorito: !imovel.favorito });
+      if (selectedImovel?.id === imovel.id) {
+        setSelectedImovel({ ...imovel, favorito: !imovel.favorito });
+      }
     }
   };
 
   const handleWhatsApp = (imovel: ImovelType) => {
+    const phone = imovel.telefoneContato?.replace(/\D/g, '');
     const message = `Olá! Tenho interesse no imóvel: ${imovel.titulo}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+    if (phone) {
+      window.open(`https://wa.me/55${phone}?text=${encodeURIComponent(message)}`, '_blank');
+    } else {
+      window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+    }
   };
 
   const handleScheduleVisit = (imovel: ImovelType) => {
@@ -135,9 +168,24 @@ export const ImoveisPage = () => {
     setVisitaFormOpen(true);
   };
 
+  const handleEdit = (imovel: ImovelType) => {
+    // Find the original DB imovel for editing
+    const dbImovel = dbImoveis.find(i => i.id === imovel.id);
+    if (dbImovel) {
+      setEditImovelData(dbImovel);
+      setEditFormOpen(true);
+      setSelectedImovel(null);
+    }
+  };
+
   const handleCloseVisitaForm = () => {
     setVisitaFormOpen(false);
     setVisitaPrefillData(undefined);
+  };
+
+  const handleCloseEditForm = () => {
+    setEditFormOpen(false);
+    setEditImovelData(null);
   };
 
   if (loading) {
@@ -206,6 +254,7 @@ export const ImoveisPage = () => {
             setSelectedImovel(null);
             handleScheduleVisit(selectedImovel);
           }}
+          onEdit={user && !isUsingMockData ? () => handleEdit(selectedImovel) : undefined}
         />
       )}
 
@@ -214,6 +263,14 @@ export const ImoveisPage = () => {
         isOpen={visitaFormOpen}
         onClose={handleCloseVisitaForm}
         prefillData={visitaPrefillData}
+      />
+
+      {/* Edit Form */}
+      <ImovelForm
+        isOpen={editFormOpen}
+        onClose={handleCloseEditForm}
+        editData={editImovelData}
+        onDeleted={() => setSelectedImovel(null)}
       />
     </div>
   );

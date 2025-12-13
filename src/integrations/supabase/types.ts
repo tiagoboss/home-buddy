@@ -88,6 +88,7 @@ export type Database = {
           novo: boolean | null
           preco: number
           quartos: number | null
+          telefone_contato: string | null
           tipo: string
           titulo: string
           updated_at: string | null
@@ -114,6 +115,7 @@ export type Database = {
           novo?: boolean | null
           preco: number
           quartos?: number | null
+          telefone_contato?: string | null
           tipo: string
           titulo: string
           updated_at?: string | null
@@ -140,6 +142,7 @@ export type Database = {
           novo?: boolean | null
           preco?: number
           quartos?: number | null
+          telefone_contato?: string | null
           tipo?: string
           titulo?: string
           updated_at?: string | null
