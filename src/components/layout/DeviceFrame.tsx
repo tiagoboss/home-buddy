@@ -6,7 +6,7 @@ interface DeviceFrameProps {
 
 export const DeviceFrame = ({ children }: DeviceFrameProps) => {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#0A0A0A' }}>
       <div className="relative w-full max-w-[390px] h-[844px] bg-background rounded-[44px] shadow-device overflow-hidden border-[12px] border-foreground/90 dark:border-foreground/20">
         {/* Dynamic Island */}
         <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[100px] h-[28px] bg-foreground/90 dark:bg-foreground/20 rounded-full z-50" />
