@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Search, Filter, Loader2, RefreshCw } from 'lucide-react';
 import { SwipeableLeadCard } from '@/components/leads/SwipeableLeadCard';
 import { LeadDetailSheet } from '@/components/leads/LeadDetailSheet';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { useLeads, Lead } from '@/hooks/useLeads';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -19,9 +20,10 @@ const filters = [
 
 interface LeadsPageProps {
   onScheduleVisit?: (lead: Lead) => void;
+  onBack?: () => void;
 }
 
-export const LeadsPage = ({ onScheduleVisit }: LeadsPageProps) => {
+export const LeadsPage = ({ onScheduleVisit, onBack }: LeadsPageProps) => {
   const { leads, loading, fetchLeads, deleteLead } = useLeads();
   const [activeFilter, setActiveFilter] = useState('todos');
   const [searchQuery, setSearchQuery] = useState('');
@@ -50,9 +52,10 @@ export const LeadsPage = ({ onScheduleVisit }: LeadsPageProps) => {
     <div className="min-h-screen bg-background content-safe">
       {/* Header */}
       <header className="sticky top-0 z-40 glassmorphism px-4 py-3">
-        <div className="flex items-center justify-between mb-3">
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">Meus Leads</h1>
-          <div className="flex items-center gap-2">
+        <PageHeader
+          title="Meus Leads"
+          onBack={onBack}
+          rightContent={
             <Button
               variant="ghost"
               size="icon"
@@ -62,8 +65,8 @@ export const LeadsPage = ({ onScheduleVisit }: LeadsPageProps) => {
             >
               <RefreshCw className={cn("w-5 h-5", isRefreshing && "animate-spin")} />
             </Button>
-          </div>
-        </div>
+          }
+        />
         
         {/* Search */}
         <div className="relative mb-3">
