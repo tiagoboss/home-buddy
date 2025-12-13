@@ -6,15 +6,42 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLeads } from '@/hooks/useLeads';
 import { toast } from 'sonner';
+import { z } from 'zod';
+
+const leadSchema = z.object({
+  nome: z.string().trim().min(1, 'Nome é obrigatório').max(100, 'Nome deve ter no máximo 100 caracteres'),
+  telefone: z.string().optional().refine(
+    (val) => !val || val.replace(/\D/g, '').length >= 10,
+    'Telefone deve ter pelo menos 10 dígitos'
+  ),
+  email: z.string().optional().refine(
+    (val) => !val || z.string().email().safeParse(val).success,
+    'Email inválido'
+  ),
+  interesse: z.string().max(200, 'Interesse deve ter no máximo 200 caracteres').optional(),
+  faixa_preco: z.string().optional(),
+  status: z.enum(['novo', 'quente', 'morno', 'frio', 'negociacao', 'fechado', 'perdido']),
+});
+
+type LeadFormData = z.infer<typeof leadSchema>;
 
 interface LeadFormProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+const formatPhone = (value: string): string => {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  if (digits.length <= 11) return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
+};
+
 export const LeadForm = ({ isOpen, onClose }: LeadFormProps) => {
   const { createLead } = useLeads();
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Partial<Record<keyof LeadFormData, string>>>({});
   const [formData, setFormData] = useState({
     nome: '',
     telefone: '',
@@ -24,23 +51,36 @@ export const LeadForm = ({ isOpen, onClose }: LeadFormProps) => {
     status: 'novo' as const,
   });
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhone(e.target.value);
+    setFormData({ ...formData, telefone: formatted });
+    if (errors.telefone) setErrors({ ...errors, telefone: undefined });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.nome.trim()) {
-      toast.error('Nome é obrigatório');
+    setErrors({});
+
+    const result = leadSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors: Partial<Record<keyof LeadFormData, string>> = {};
+      result.error.errors.forEach((err) => {
+        const field = err.path[0] as keyof LeadFormData;
+        fieldErrors[field] = err.message;
+      });
+      setErrors(fieldErrors);
       return;
     }
 
     setLoading(true);
     try {
       const { error } = await createLead({
-        nome: formData.nome.trim(),
-        telefone: formData.telefone || null,
-        email: formData.email || null,
-        interesse: formData.interesse || null,
-        faixa_preco: formData.faixa_preco || null,
-        status: formData.status,
+        nome: result.data.nome,
+        telefone: result.data.telefone || null,
+        email: result.data.email || null,
+        interesse: result.data.interesse || null,
+        faixa_preco: result.data.faixa_preco || null,
+        status: result.data.status,
         bairros: null,
         ultimo_contato: new Date().toISOString(),
         avatar: null,
@@ -90,10 +130,14 @@ export const LeadForm = ({ isOpen, onClose }: LeadFormProps) => {
                 id="nome"
                 placeholder="Nome do lead"
                 value={formData.nome}
-                onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                className="h-12 rounded-xl"
+                onChange={(e) => {
+                  setFormData({ ...formData, nome: e.target.value });
+                  if (errors.nome) setErrors({ ...errors, nome: undefined });
+                }}
+                className={`h-12 rounded-xl ${errors.nome ? 'border-destructive' : ''}`}
                 maxLength={100}
               />
+              {errors.nome && <p className="text-xs text-destructive">{errors.nome}</p>}
             </div>
 
             <div className="space-y-2">
@@ -102,10 +146,11 @@ export const LeadForm = ({ isOpen, onClose }: LeadFormProps) => {
                 id="telefone"
                 placeholder="(00) 00000-0000"
                 value={formData.telefone}
-                onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
-                className="h-12 rounded-xl"
-                maxLength={20}
+                onChange={handlePhoneChange}
+                className={`h-12 rounded-xl ${errors.telefone ? 'border-destructive' : ''}`}
+                maxLength={16}
               />
+              {errors.telefone && <p className="text-xs text-destructive">{errors.telefone}</p>}
             </div>
 
             <div className="space-y-2">
@@ -115,10 +160,14 @@ export const LeadForm = ({ isOpen, onClose }: LeadFormProps) => {
                 type="email"
                 placeholder="email@exemplo.com"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="h-12 rounded-xl"
+                onChange={(e) => {
+                  setFormData({ ...formData, email: e.target.value });
+                  if (errors.email) setErrors({ ...errors, email: undefined });
+                }}
+                className={`h-12 rounded-xl ${errors.email ? 'border-destructive' : ''}`}
                 maxLength={255}
               />
+              {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
             </div>
 
             <div className="space-y-2">

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,6 +8,14 @@ import { useLeads } from '@/hooks/useLeads';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { z } from 'zod';
+
+const ligacaoSchema = z.object({
+  lead_id: z.string().min(1, 'Selecione um lead'),
+  descricao: z.string().trim().min(1, 'Descrição é obrigatória').max(1000, 'Descrição deve ter no máximo 1000 caracteres'),
+});
+
+type LigacaoFormData = z.infer<typeof ligacaoSchema>;
 
 interface LigacaoFormProps {
   isOpen: boolean;
@@ -19,6 +26,7 @@ export const LigacaoForm = ({ isOpen, onClose }: LigacaoFormProps) => {
   const { user } = useAuth();
   const { leads, updateLead } = useLeads();
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Partial<Record<keyof LigacaoFormData, string>>>({});
   const [formData, setFormData] = useState({
     lead_id: '',
     descricao: '',
@@ -26,9 +34,16 @@ export const LigacaoForm = ({ isOpen, onClose }: LigacaoFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.lead_id || !formData.descricao.trim()) {
-      toast.error('Selecione um lead e descreva a ligação');
+    setErrors({});
+
+    const result = ligacaoSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors: Partial<Record<keyof LigacaoFormData, string>> = {};
+      result.error.errors.forEach((err) => {
+        const field = err.path[0] as keyof LigacaoFormData;
+        fieldErrors[field] = err.message;
+      });
+      setErrors(fieldErrors);
       return;
     }
 
@@ -43,15 +58,15 @@ export const LigacaoForm = ({ isOpen, onClose }: LigacaoFormProps) => {
         .from('interacoes')
         .insert({
           user_id: user.id,
-          lead_id: formData.lead_id,
+          lead_id: result.data.lead_id,
           tipo: 'ligacao',
-          descricao: formData.descricao.trim(),
+          descricao: result.data.descricao,
         });
 
       if (error) throw error;
 
       // Update lead's ultimo_contato
-      await updateLead(formData.lead_id, {
+      await updateLead(result.data.lead_id, {
         ultimo_contato: new Date().toISOString(),
       });
       
@@ -95,9 +110,12 @@ export const LigacaoForm = ({ isOpen, onClose }: LigacaoFormProps) => {
               <Label htmlFor="lead">Lead *</Label>
               <Select 
                 value={formData.lead_id} 
-                onValueChange={(value) => setFormData({ ...formData, lead_id: value })}
+                onValueChange={(value) => {
+                  setFormData({ ...formData, lead_id: value });
+                  if (errors.lead_id) setErrors({ ...errors, lead_id: undefined });
+                }}
               >
-                <SelectTrigger className="h-12 rounded-xl">
+                <SelectTrigger className={`h-12 rounded-xl ${errors.lead_id ? 'border-destructive' : ''}`}>
                   <SelectValue placeholder="Selecione o lead" />
                 </SelectTrigger>
                 <SelectContent>
@@ -112,6 +130,7 @@ export const LigacaoForm = ({ isOpen, onClose }: LigacaoFormProps) => {
                   )}
                 </SelectContent>
               </Select>
+              {errors.lead_id && <p className="text-xs text-destructive">{errors.lead_id}</p>}
             </div>
 
             <div className="space-y-2">
@@ -120,10 +139,14 @@ export const LigacaoForm = ({ isOpen, onClose }: LigacaoFormProps) => {
                 id="descricao"
                 placeholder="Descreva o que foi conversado..."
                 value={formData.descricao}
-                onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-                className="min-h-[120px] rounded-xl resize-none"
+                onChange={(e) => {
+                  setFormData({ ...formData, descricao: e.target.value });
+                  if (errors.descricao) setErrors({ ...errors, descricao: undefined });
+                }}
+                className={`min-h-[120px] rounded-xl resize-none ${errors.descricao ? 'border-destructive' : ''}`}
                 maxLength={1000}
               />
+              {errors.descricao && <p className="text-xs text-destructive">{errors.descricao}</p>}
             </div>
 
             <Button 
