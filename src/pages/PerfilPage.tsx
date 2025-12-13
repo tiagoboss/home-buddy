@@ -14,7 +14,12 @@ import {
 import { useState } from 'react';
 import { useTheme } from 'next-themes';
 import { corretor, getRankingBadge, formatCurrency } from '@/data/mockData';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { cn } from '@/lib/utils';
+
+interface PerfilPageProps {
+  onBack?: () => void;
+}
 
 const avaliacoes = [
   {
@@ -77,7 +82,7 @@ const themeOptions = [
   { value: 'system', icon: Monitor, label: 'Sistema' },
 ];
 
-export const PerfilPage = () => {
+export const PerfilPage = ({ onBack }: PerfilPageProps) => {
   const { theme, setTheme } = useTheme();
   const [showAllReviews, setShowAllReviews] = useState(false);
   
@@ -88,8 +93,9 @@ export const PerfilPage = () => {
   return (
     <div className="bg-background pb-4">
       {/* Header */}
-      <header className="px-4 pt-6 pb-4">
-        <div className="flex flex-col items-center">
+      <header className="px-4 pt-4 pb-4">
+        <PageHeader title="Meu Perfil" onBack={onBack} />
+        <div className="flex flex-col items-center mt-2">
           <div className="relative mb-3">
             <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-2xl font-bold text-primary">
               {corretor.nome.split(' ').map(n => n[0]).join('').slice(0, 2)}

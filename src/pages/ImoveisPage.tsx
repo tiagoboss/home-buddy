@@ -6,13 +6,18 @@ import { ImovelFilters } from '@/components/imoveis/ImovelFilters';
 import { SwipeableImovelCard } from '@/components/imoveis/SwipeableImovelCard';
 import { ImovelDetailSheet } from '@/components/imoveis/ImovelDetailSheet';
 import { ImoveisEmptyState } from '@/components/imoveis/ImoveisEmptyState';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { VisitaForm } from '@/components/forms/VisitaForm';
 import { ImovelForm } from '@/components/forms/ImovelForm';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Imovel as ImovelType } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 
-export const ImoveisPage = () => {
+interface ImoveisPageProps {
+  onBack?: () => void;
+}
+
+export const ImoveisPage = ({ onBack }: ImoveisPageProps) => {
   const { user } = useAuth();
   const { imoveis: dbImoveis, loading, updateImovel } = useImoveis();
   const { isFavorito, toggleFavorito } = useFavoritos();
@@ -199,7 +204,7 @@ export const ImoveisPage = () => {
     <div className="px-4 pt-4 pb-4">
       {/* Header */}
       <div className="mb-4">
-        <h1 className="text-2xl font-bold text-foreground">Imóveis</h1>
+        <PageHeader title="Imóveis" onBack={onBack} />
         <p className="text-sm text-muted-foreground">{allImoveis.length} imóveis cadastrados</p>
       </div>
 

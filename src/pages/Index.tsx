@@ -49,6 +49,8 @@ const Index = () => {
     setActiveForm(action);
   };
   
+  const handleGoHome = () => setActiveTab('home');
+  
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
@@ -57,16 +59,17 @@ const Index = () => {
         return (
           <LeadsPage 
             onScheduleVisit={() => setActiveForm('visita')}
+            onBack={handleGoHome}
           />
         );
       case 'imoveis':
-        return <ImoveisPage />;
+        return <ImoveisPage onBack={handleGoHome} />;
       case 'agenda':
-        return <AgendaPage />;
+        return <AgendaPage onBack={handleGoHome} />;
       case 'perfil':
-        return <PerfilPage />;
+        return <PerfilPage onBack={handleGoHome} />;
       case 'propostas':
-        return <PropostasPage />;
+        return <PropostasPage onBack={handleGoHome} />;
       default:
         return <HomePage />;
     }

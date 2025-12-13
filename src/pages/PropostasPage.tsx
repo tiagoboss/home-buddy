@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Search, Filter, Loader2, RefreshCw, FileText } from 'lucide-react';
 import { SwipeablePropostaCard } from '@/components/propostas/SwipeablePropostaCard';
 import { PropostaDetailSheet } from '@/components/propostas/PropostaDetailSheet';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { usePropostas, Proposta } from '@/hooks/usePropostas';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,11 @@ const filters = [
   { id: 'expirada', label: 'Expiradas' },
 ];
 
-export const PropostasPage = () => {
+interface PropostasPageProps {
+  onBack?: () => void;
+}
+
+export const PropostasPage = ({ onBack }: PropostasPageProps) => {
   const { propostas, loading, fetchPropostas, updateProposta } = usePropostas();
   const [activeFilter, setActiveFilter] = useState('todos');
   const [searchQuery, setSearchQuery] = useState('');
@@ -80,18 +85,21 @@ export const PropostasPage = () => {
     <div className="min-h-screen bg-background content-safe">
       {/* Header */}
       <header className="sticky top-0 z-40 glassmorphism px-4 py-3">
-        <div className="flex items-center justify-between mb-3">
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">Propostas</h1>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            className="h-9 w-9"
-          >
-            <RefreshCw className={cn("w-5 h-5", isRefreshing && "animate-spin")} />
-          </Button>
-        </div>
+        <PageHeader
+          title="Propostas"
+          onBack={onBack}
+          rightContent={
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="h-9 w-9"
+            >
+              <RefreshCw className={cn("w-5 h-5", isRefreshing && "animate-spin")} />
+            </Button>
+          }
+        />
 
         {/* Stats Cards */}
         <div className="grid grid-cols-3 gap-2 mb-3">

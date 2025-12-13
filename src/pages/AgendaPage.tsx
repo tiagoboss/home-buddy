@@ -4,6 +4,7 @@ import { useCompromissos, Compromisso } from '@/hooks/useCompromissos';
 import { SwipeableCompromissoCard } from '@/components/agenda/SwipeableCompromissoCard';
 import { CompromissoDetailSheet } from '@/components/agenda/CompromissoDetailSheet';
 import { AgendaEmptyState } from '@/components/agenda/AgendaEmptyState';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { VisitaForm } from '@/components/forms/VisitaForm';
 import { cn } from '@/lib/utils';
 import { format, isSameDay, parseISO } from 'date-fns';
@@ -12,7 +13,11 @@ import { toast } from 'sonner';
 
 const views = ['Dia', 'Semana', 'Mês'];
 
-export const AgendaPage = () => {
+interface AgendaPageProps {
+  onBack?: () => void;
+}
+
+export const AgendaPage = ({ onBack }: AgendaPageProps) => {
   const [activeView, setActiveView] = useState('Dia');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedCompromisso, setSelectedCompromisso] = useState<Compromisso | null>(null);
@@ -85,7 +90,7 @@ export const AgendaPage = () => {
     <div className="min-h-screen bg-background content-safe">
       {/* Header */}
       <header className="sticky top-0 z-40 glassmorphism px-4 py-3">
-        <h1 className="text-2xl font-bold text-foreground tracking-tight mb-3">Agenda</h1>
+        <PageHeader title="Agenda" onBack={onBack} />
         
         {/* Date Navigator */}
         <div className="flex items-center justify-between mb-3">
