@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DollarSign, TrendingUp, Target, Clock, ChevronRight } from 'lucide-react';
+import { DollarSign, TrendingUp, Target, Clock, ChevronRight, FileText } from 'lucide-react';
 import { KPICard } from '@/components/ui/KPICard';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { CompromissoCard } from '@/components/home/CompromissoCard';
@@ -12,12 +12,14 @@ import { corretor, compromissos, leads, imoveis } from '@/data/mockData';
 import { Compromisso as MockCompromisso, Lead as MockLead, Imovel, TabType } from '@/types';
 import { Compromisso as HookCompromisso } from '@/hooks/useCompromissos';
 import { useFavoritos } from '@/hooks/useFavoritos';
+import { usePropostas } from '@/hooks/usePropostas';
 
 interface HomePageProps {
   onTabChange?: (tab: TabType) => void;
 }
 
 export const HomePage = ({ onTabChange }: HomePageProps) => {
+  const { propostas } = usePropostas();
   const hotLeads = leads.filter(l => l.status === 'quente' || l.status === 'negociacao');
   const todayCompromissos = compromissos.slice(0, 3);
   
@@ -44,6 +46,10 @@ export const HomePage = ({ onTabChange }: HomePageProps) => {
   });
   
   const { isFavorito, toggleFavorito } = useFavoritos();
+
+  // Propostas stats
+  const propostasPendentes = propostas.filter(p => p.status === 'pendente').length;
+  const propostasAceitas = propostas.filter(p => p.status === 'aceita').length;
   
   return (
     <div className="bg-background">
@@ -84,6 +90,28 @@ export const HomePage = ({ onTabChange }: HomePageProps) => {
             total={corretor.meta}
             label="Meta Mensal"
           />
+        </section>
+        
+        {/* Propostas Card */}
+        <section className="px-4">
+          <button
+            onClick={() => onTabChange?.('propostas')}
+            className="w-full bg-gradient-to-r from-primary/10 to-primary/5 rounded-2xl p-4 flex items-center gap-4 animate-scale-press"
+          >
+            <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center">
+              <FileText className="w-6 h-6 text-primary" />
+            </div>
+            <div className="flex-1 text-left">
+              <p className="font-semibold text-foreground">Minhas Propostas</p>
+              <p className="text-sm text-muted-foreground">
+                {propostasPendentes > 0 
+                  ? `${propostasPendentes} pendente${propostasPendentes > 1 ? 's' : ''}`
+                  : 'Nenhuma pendente'}
+                {propostasAceitas > 0 && ` • ${propostasAceitas} aceita${propostasAceitas > 1 ? 's' : ''}`}
+              </p>
+            </div>
+            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+          </button>
         </section>
         
         {/* Próximos Compromissos */}

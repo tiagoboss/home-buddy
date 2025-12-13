@@ -11,6 +11,7 @@ import { LeadsPage } from '@/pages/LeadsPage';
 import { ImoveisPage } from '@/pages/ImoveisPage';
 import { AgendaPage } from '@/pages/AgendaPage';
 import { PerfilPage } from '@/pages/PerfilPage';
+import { PropostasPage } from '@/pages/PropostasPage';
 import { LeadForm } from '@/components/forms/LeadForm';
 import { VisitaForm } from '@/components/forms/VisitaForm';
 import { ImovelForm } from '@/components/forms/ImovelForm';
@@ -64,6 +65,8 @@ const Index = () => {
         return <AgendaPage />;
       case 'perfil':
         return <PerfilPage />;
+      case 'propostas':
+        return <PropostasPage />;
       default:
         return <HomePage />;
     }
