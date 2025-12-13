@@ -282,6 +282,60 @@ export type Database = {
         }
         Relationships: []
       }
+      propostas: {
+        Row: {
+          created_at: string | null
+          id: string
+          imovel_id: string
+          lead_id: string
+          observacoes: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+          validade: string | null
+          valor_proposta: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          imovel_id: string
+          lead_id: string
+          observacoes?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+          validade?: string | null
+          valor_proposta: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          imovel_id?: string
+          lead_id?: string
+          observacoes?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+          validade?: string | null
+          valor_proposta?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "propostas_imovel_id_fkey"
+            columns: ["imovel_id"]
+            isOneToOne: false
+            referencedRelation: "imoveis"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "propostas_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -15,6 +15,7 @@ import { LeadForm } from '@/components/forms/LeadForm';
 import { VisitaForm } from '@/components/forms/VisitaForm';
 import { ImovelForm } from '@/components/forms/ImovelForm';
 import { LigacaoForm } from '@/components/forms/LigacaoForm';
+import { PropostaForm } from '@/components/forms/PropostaForm';
 import { NotificationsSheet } from '@/components/notifications/NotificationsSheet';
 import { TabType, Notificacao } from '@/types';
 import { notificacoes as initialNotificacoes } from '@/data/mockData';
@@ -44,10 +45,6 @@ const Index = () => {
   };
 
   const handleActionSelect = (action: QuickActionType) => {
-    if (action === 'proposta') {
-      toast.info('Nova Proposta em breve!');
-      return;
-    }
     if (action === 'checkin') {
       toast.info('Check-in de Visita em breve!');
       return;
@@ -148,6 +145,10 @@ const Index = () => {
         />
         <LigacaoForm 
           isOpen={activeForm === 'ligacao'} 
+          onClose={() => setActiveForm(null)} 
+        />
+        <PropostaForm 
+          isOpen={activeForm === 'proposta'} 
           onClose={() => setActiveForm(null)} 
         />
       </div>

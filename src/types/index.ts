@@ -76,3 +76,18 @@ export interface Notificacao {
   data: string;
   link?: string;
 }
+
+export type PropostaStatus = 'pendente' | 'aceita' | 'recusada' | 'contra_proposta' | 'expirada';
+
+export interface Proposta {
+  id: string;
+  user_id: string;
+  lead_id: string;
+  imovel_id: string;
+  valor_proposta: number;
+  status: PropostaStatus;
+  observacoes?: string;
+  validade?: string;
+  created_at: string;
+  updated_at: string;
+}
