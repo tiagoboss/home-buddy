@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { X, MapPin, Bed, Bath, Car, Ruler, Building2, Heart, MessageCircle, Phone, Calendar, Navigation, Share2, Pencil } from 'lucide-react';
+import { X, MapPin, Bed, Bath, Car, Ruler, Building2, Heart, MessageCircle, Calendar, Navigation, Share2, Pencil, Send } from 'lucide-react';
 import { Imovel } from '@/types';
 import { ImovelModalidadeBadge } from './ImovelModalidadeBadge';
 import { cn } from '@/lib/utils';
@@ -57,21 +57,10 @@ export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite, onSched
     return phone.replace(/\D/g, '');
   };
 
-  const handleWhatsApp = () => {
-    const phone = getPhoneNumber();
-    const message = `Olá! Tenho interesse no imóvel: ${imovel.titulo} - ${formatCurrency(imovel.preco)}`;
-    if (phone) {
-      window.open(`https://wa.me/55${phone}?text=${encodeURIComponent(message)}`, '_blank');
-    } else {
-      window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
-    }
-  };
-
-  const handleCall = () => {
-    const phone = getPhoneNumber();
-    if (phone) {
-      window.open(`tel:+55${phone}`, '_blank');
-    }
+  const handleSendToClient = () => {
+    // Opens WhatsApp to send property info to a client (no pre-filled number)
+    const message = `🏠 *${imovel.titulo}*\n\n📍 ${imovel.bairro}, ${imovel.cidade}\n💰 ${formatCurrency(imovel.preco)}${imovel.modalidade === 'locacao' ? '/mês' : imovel.modalidade === 'temporada' ? '/diária' : ''}\n\n🛏️ ${imovel.quartos} quartos | 🚿 ${imovel.banheiros} banheiros | 🚗 ${imovel.vagas} vagas | 📐 ${imovel.area}m²${imovel.descricao ? `\n\n${imovel.descricao}` : ''}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   const handleNavigate = () => {
@@ -324,30 +313,24 @@ export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite, onSched
         <div className="px-4 py-4 border-t border-border bg-background">
           <div className="flex gap-3">
             <button
-              onClick={handleWhatsApp}
+              onClick={handleSendToClient}
               className="flex-1 flex items-center justify-center gap-2 py-3 bg-green-500 text-white rounded-xl font-medium"
             >
-              <MessageCircle className="w-5 h-5" />
-              WhatsApp
-            </button>
-            <button
-              onClick={handleCall}
-              disabled={!hasPhone}
-              className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-medium",
-                hasPhone 
-                  ? "bg-primary text-primary-foreground" 
-                  : "bg-muted text-muted-foreground cursor-not-allowed"
-              )}
-            >
-              <Phone className="w-5 h-5" />
-              Ligar
+              <Send className="w-5 h-5" />
+              Enviar
             </button>
             <button
               onClick={onScheduleVisit}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-muted rounded-xl font-medium"
+              className="flex-1 flex items-center justify-center gap-2 py-3 bg-primary text-primary-foreground rounded-xl font-medium"
             >
               <Calendar className="w-5 h-5" />
+              Agendar
+            </button>
+            <button
+              onClick={handleNavigate}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-muted rounded-xl font-medium"
+            >
+              <Navigation className="w-5 h-5" />
             </button>
           </div>
         </div>

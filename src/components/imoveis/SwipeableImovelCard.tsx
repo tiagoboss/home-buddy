@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Building2, MapPin, Bed, Ruler, Bath, Car, Heart, Calendar, MessageCircle } from 'lucide-react';
+import { Building2, MapPin, Bed, Ruler, Bath, Car, Heart, Calendar, Send } from 'lucide-react';
 import { Imovel } from '@/types';
 import { ImovelModalidadeBadge } from './ImovelModalidadeBadge';
 import { cn } from '@/lib/utils';
@@ -8,7 +8,7 @@ interface SwipeableImovelCardProps {
   imovel: Imovel;
   onClick: () => void;
   onFavorite: () => void;
-  onWhatsApp: () => void;
+  onSendToClient: () => void;
   onScheduleVisit: () => void;
   viewMode: 'list' | 'grid';
 }
@@ -26,7 +26,7 @@ export const SwipeableImovelCard = ({
   imovel,
   onClick,
   onFavorite,
-  onWhatsApp,
+  onSendToClient,
   onScheduleVisit,
   viewMode,
 }: SwipeableImovelCardProps) => {
@@ -50,7 +50,7 @@ export const SwipeableImovelCard = ({
   const handleTouchEnd = () => {
     setIsDragging(false);
     if (translateX < -60) {
-      onWhatsApp();
+      onSendToClient();
     } else if (translateX > 60) {
       onScheduleVisit();
     }
@@ -141,8 +141,8 @@ export const SwipeableImovelCard = ({
         </div>
         <div className="flex-1 bg-green-500 flex items-center justify-end pr-4">
           <div className="flex flex-col items-center text-white">
-            <MessageCircle className="w-6 h-6" />
-            <span className="text-xs mt-1">WhatsApp</span>
+            <Send className="w-6 h-6" />
+            <span className="text-xs mt-1">Enviar</span>
           </div>
         </div>
       </div>
