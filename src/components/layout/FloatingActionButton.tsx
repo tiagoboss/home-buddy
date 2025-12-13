@@ -4,9 +4,10 @@ import { useState } from 'react';
 
 interface FloatingActionButtonProps {
   onClick: () => void;
+  isOpen?: boolean;
 }
 
-export const FloatingActionButton = ({ onClick }: FloatingActionButtonProps) => {
+export const FloatingActionButton = ({ onClick, isOpen = false }: FloatingActionButtonProps) => {
   const [isPressed, setIsPressed] = useState(false);
 
   return (
@@ -18,11 +19,17 @@ export const FloatingActionButton = ({ onClick }: FloatingActionButtonProps) => 
       onMouseUp={() => setIsPressed(false)}
       onMouseLeave={() => setIsPressed(false)}
       className={cn(
-        "absolute bottom-24 right-4 w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-elevated z-50 transition-transform duration-150",
+        "absolute bottom-24 right-4 w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-elevated z-50 transition-all duration-300",
         isPressed ? "scale-90" : "scale-100 active:scale-90"
       )}
     >
-      <Plus className="w-7 h-7 text-primary-foreground" strokeWidth={2.5} />
+      <Plus 
+        className={cn(
+          "w-7 h-7 text-primary-foreground transition-transform duration-300",
+          isOpen && "rotate-45"
+        )} 
+        strokeWidth={2.5} 
+      />
     </button>
   );
 };
