@@ -1,9 +1,14 @@
 import { Bell } from 'lucide-react';
 import { corretor, getGreeting, getRankingBadge } from '@/data/mockData';
+import { toast } from 'sonner';
 
 export const Header = () => {
   const greeting = getGreeting();
   const rankBadge = getRankingBadge(corretor.ranking);
+
+  const handleNotifications = () => {
+    toast.info('Central de notificações em breve!');
+  };
   
   return (
     <header className="bg-background/80 backdrop-blur-sm border-b border-border/30">
@@ -25,7 +30,10 @@ export const Header = () => {
           </div>
         </div>
         
-        <button className="relative w-10 h-10 rounded-full bg-secondary flex items-center justify-center animate-scale-press">
+        <button 
+          onClick={handleNotifications}
+          className="relative w-10 h-10 rounded-full bg-secondary flex items-center justify-center animate-scale-press"
+        >
           <Bell className="w-5 h-5 text-foreground" />
           <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-destructive rounded-full flex items-center justify-center text-[10px] font-bold text-destructive-foreground animate-pulse-badge">
             3
