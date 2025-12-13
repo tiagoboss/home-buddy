@@ -64,3 +64,15 @@ export interface Imovel {
 }
 
 export type TabType = 'home' | 'leads' | 'imoveis' | 'agenda' | 'perfil';
+
+export type NotificationType = 'lead' | 'visita' | 'proposta' | 'meta' | 'sistema';
+
+export interface Notificacao {
+  id: string;
+  tipo: NotificationType;
+  titulo: string;
+  mensagem: string;
+  lida: boolean;
+  data: string;
+  link?: string;
+}
