@@ -72,10 +72,19 @@ export type Database = {
           area: number | null
           bairro: string | null
           baixou_preco: boolean | null
+          banheiros: number | null
+          caracteristicas: string[] | null
           cidade: string | null
+          condominio: number | null
+          construtora: string | null
           created_at: string | null
+          descricao: string | null
+          entrega: string | null
+          favorito: boolean | null
           foto: string | null
           id: string
+          iptu: number | null
+          modalidade: string | null
           novo: boolean | null
           preco: number
           quartos: number | null
@@ -83,15 +92,25 @@ export type Database = {
           titulo: string
           updated_at: string | null
           user_id: string
+          vagas: number | null
         }
         Insert: {
           area?: number | null
           bairro?: string | null
           baixou_preco?: boolean | null
+          banheiros?: number | null
+          caracteristicas?: string[] | null
           cidade?: string | null
+          condominio?: number | null
+          construtora?: string | null
           created_at?: string | null
+          descricao?: string | null
+          entrega?: string | null
+          favorito?: boolean | null
           foto?: string | null
           id?: string
+          iptu?: number | null
+          modalidade?: string | null
           novo?: boolean | null
           preco: number
           quartos?: number | null
@@ -99,15 +118,25 @@ export type Database = {
           titulo: string
           updated_at?: string | null
           user_id: string
+          vagas?: number | null
         }
         Update: {
           area?: number | null
           bairro?: string | null
           baixou_preco?: boolean | null
+          banheiros?: number | null
+          caracteristicas?: string[] | null
           cidade?: string | null
+          condominio?: number | null
+          construtora?: string | null
           created_at?: string | null
+          descricao?: string | null
+          entrega?: string | null
+          favorito?: boolean | null
           foto?: string | null
           id?: string
+          iptu?: number | null
+          modalidade?: string | null
           novo?: boolean | null
           preco?: number
           quartos?: number | null
@@ -115,6 +144,7 @@ export type Database = {
           titulo?: string
           updated_at?: string | null
           user_id?: string
+          vagas?: number | null
         }
         Relationships: []
       }

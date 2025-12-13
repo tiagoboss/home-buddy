@@ -15,14 +15,31 @@ interface ImovelFormProps {
 export const ImovelForm = ({ isOpen, onClose }: ImovelFormProps) => {
   const { createImovel } = useImoveis();
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    titulo: string;
+    tipo: string;
+    modalidade: 'venda' | 'locacao' | 'lancamento' | 'temporada';
+    preco: string;
+    bairro: string;
+    cidade: string;
+    quartos: string;
+    banheiros: string;
+    vagas: string;
+    area: string;
+    condominio: string;
+    foto: string;
+  }>({
     titulo: '',
     tipo: '',
+    modalidade: 'venda',
     preco: '',
     bairro: '',
     cidade: '',
     quartos: '',
+    banheiros: '',
+    vagas: '',
     area: '',
+    condominio: '',
     foto: '',
   });
 
@@ -45,20 +62,30 @@ export const ImovelForm = ({ isOpen, onClose }: ImovelFormProps) => {
       const { error } = await createImovel({
         titulo: formData.titulo.trim(),
         tipo: formData.tipo,
+        modalidade: formData.modalidade,
         preco,
         bairro: formData.bairro || null,
         cidade: formData.cidade || null,
         quartos: parseInt(formData.quartos) || 0,
+        banheiros: parseInt(formData.banheiros) || 0,
+        vagas: parseInt(formData.vagas) || 0,
         area: parseFloat(formData.area) || 0,
+        condominio: formData.condominio ? parseFloat(formData.condominio.replace(/\D/g, '')) : null,
+        iptu: null,
+        descricao: null,
+        caracteristicas: null,
+        entrega: null,
+        construtora: null,
         foto: formData.foto || null,
         novo: true,
         baixou_preco: false,
+        favorito: false,
       });
 
       if (error) throw error;
       
       toast.success('Imóvel cadastrado com sucesso!');
-      setFormData({ titulo: '', tipo: '', preco: '', bairro: '', cidade: '', quartos: '', area: '', foto: '' });
+      setFormData({ titulo: '', tipo: '', modalidade: 'venda', preco: '', bairro: '', cidade: '', quartos: '', banheiros: '', vagas: '', area: '', condominio: '', foto: '' });
       onClose();
     } catch (err: any) {
       toast.error(err.message || 'Erro ao cadastrar imóvel');
@@ -116,6 +143,24 @@ export const ImovelForm = ({ isOpen, onClose }: ImovelFormProps) => {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="modalidade">Modalidade *</Label>
+              <Select 
+                value={formData.modalidade} 
+                onValueChange={(value: 'venda' | 'locacao' | 'lancamento' | 'temporada') => setFormData({ ...formData, modalidade: value })}
+              >
+                <SelectTrigger className="h-12 rounded-xl">
+                  <SelectValue placeholder="Selecione a modalidade" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="venda">Venda</SelectItem>
+                  <SelectItem value="locacao">Locação</SelectItem>
+                  <SelectItem value="lancamento">Lançamento</SelectItem>
+                  <SelectItem value="temporada">Temporada</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="tipo">Tipo *</Label>
               <Select 
                 value={formData.tipo} 
@@ -128,6 +173,7 @@ export const ImovelForm = ({ isOpen, onClose }: ImovelFormProps) => {
                   <SelectItem value="Apartamento">Apartamento</SelectItem>
                   <SelectItem value="Casa">Casa</SelectItem>
                   <SelectItem value="Cobertura">Cobertura</SelectItem>
+                  <SelectItem value="Studio">Studio</SelectItem>
                   <SelectItem value="Terreno">Terreno</SelectItem>
                   <SelectItem value="Comercial">Comercial</SelectItem>
                   <SelectItem value="Sala">Sala</SelectItem>
@@ -146,7 +192,7 @@ export const ImovelForm = ({ isOpen, onClose }: ImovelFormProps) => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-3">
               <div className="space-y-2">
                 <Label htmlFor="quartos">Quartos</Label>
                 <Input
@@ -162,6 +208,36 @@ export const ImovelForm = ({ isOpen, onClose }: ImovelFormProps) => {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="banheiros">Banheiros</Label>
+                <Input
+                  id="banheiros"
+                  type="number"
+                  placeholder="0"
+                  value={formData.banheiros}
+                  onChange={(e) => setFormData({ ...formData, banheiros: e.target.value })}
+                  className="h-12 rounded-xl"
+                  min="0"
+                  max="20"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="vagas">Vagas</Label>
+                <Input
+                  id="vagas"
+                  type="number"
+                  placeholder="0"
+                  value={formData.vagas}
+                  onChange={(e) => setFormData({ ...formData, vagas: e.target.value })}
+                  className="h-12 rounded-xl"
+                  min="0"
+                  max="20"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <Label htmlFor="area">Área (m²)</Label>
                 <Input
                   id="area"
@@ -171,6 +247,17 @@ export const ImovelForm = ({ isOpen, onClose }: ImovelFormProps) => {
                   onChange={(e) => setFormData({ ...formData, area: e.target.value })}
                   className="h-12 rounded-xl"
                   min="0"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="condominio">Condomínio</Label>
+                <Input
+                  id="condominio"
+                  placeholder="R$ 0"
+                  value={formData.condominio ? formatCurrency(formData.condominio) : ''}
+                  onChange={(e) => setFormData({ ...formData, condominio: e.target.value.replace(/\D/g, '') })}
+                  className="h-12 rounded-xl"
                 />
               </div>
             </div>
