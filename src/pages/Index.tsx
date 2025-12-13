@@ -15,13 +15,33 @@ import { LeadForm } from '@/components/forms/LeadForm';
 import { VisitaForm } from '@/components/forms/VisitaForm';
 import { ImovelForm } from '@/components/forms/ImovelForm';
 import { LigacaoForm } from '@/components/forms/LigacaoForm';
-import { TabType } from '@/types';
+import { NotificationsSheet } from '@/components/notifications/NotificationsSheet';
+import { TabType, Notificacao } from '@/types';
+import { notificacoes as initialNotificacoes } from '@/data/mockData';
 import { toast } from 'sonner';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
   const [activeForm, setActiveForm] = useState<QuickActionType>(null);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<Notificacao[]>(initialNotificacoes);
+
+  const unreadCount = notifications.filter(n => !n.lida).length;
+
+  const handleMarkAsRead = (id: string) => {
+    setNotifications(prev => 
+      prev.map(n => n.id === id ? { ...n, lida: true } : n)
+    );
+  };
+
+  const handleMarkAllAsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, lida: true })));
+  };
+
+  const handleDeleteNotification = (id: string) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  };
 
   const handleActionSelect = (action: QuickActionType) => {
     if (action === 'proposta') {
@@ -70,7 +90,10 @@ const Index = () => {
         {/* Fixed Header (only on home) */}
         {showHeader && (
           <div className="flex-shrink-0 z-30">
-            <Header />
+            <Header 
+              unreadCount={unreadCount}
+              onNotificationsClick={() => setIsNotificationsOpen(true)}
+            />
           </div>
         )}
         
@@ -96,6 +119,16 @@ const Index = () => {
           isOpen={isQuickActionsOpen}
           onClose={() => setIsQuickActionsOpen(false)}
           onActionSelect={handleActionSelect}
+        />
+
+        {/* Notifications Sheet */}
+        <NotificationsSheet
+          open={isNotificationsOpen}
+          onOpenChange={setIsNotificationsOpen}
+          notifications={notifications}
+          onMarkAsRead={handleMarkAsRead}
+          onMarkAllAsRead={handleMarkAllAsRead}
+          onDelete={handleDeleteNotification}
         />
 
         {/* Forms */}
