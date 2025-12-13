@@ -27,6 +27,7 @@ const actionsByTab: Record<TabType, QuickActionType[]> = {
   imoveis: ['imovel', 'visita'],
   agenda: ['visita', 'checkin', 'ligacao'],
   perfil: [],
+  propostas: ['proposta', 'visita', 'ligacao'],
 };
 
 export const QuickActionsSheet = ({ isOpen, onClose, onActionSelect, currentTab = 'home' }: QuickActionsSheetProps) => {

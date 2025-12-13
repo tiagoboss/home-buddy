@@ -63,7 +63,7 @@ export interface Imovel {
   telefoneContato?: string;
 }
 
-export type TabType = 'home' | 'leads' | 'imoveis' | 'agenda' | 'perfil';
+export type TabType = 'home' | 'leads' | 'imoveis' | 'agenda' | 'perfil' | 'propostas';
 
 export type NotificationType = 'lead' | 'visita' | 'proposta' | 'meta' | 'sistema';
 
