@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Filter, Plus, Loader2, RefreshCw } from 'lucide-react';
+import { Search, Filter, Loader2, RefreshCw } from 'lucide-react';
 import { SwipeableLeadCard } from '@/components/leads/SwipeableLeadCard';
 import { LeadDetailSheet } from '@/components/leads/LeadDetailSheet';
 import { useLeads, Lead } from '@/hooks/useLeads';
@@ -18,11 +18,10 @@ const filters = [
 ];
 
 interface LeadsPageProps {
-  onAddLead?: () => void;
   onScheduleVisit?: (lead: Lead) => void;
 }
 
-export const LeadsPage = ({ onAddLead, onScheduleVisit }: LeadsPageProps) => {
+export const LeadsPage = ({ onScheduleVisit }: LeadsPageProps) => {
   const { leads, loading, fetchLeads, deleteLead } = useLeads();
   const [activeFilter, setActiveFilter] = useState('todos');
   const [searchQuery, setSearchQuery] = useState('');
@@ -63,15 +62,6 @@ export const LeadsPage = ({ onAddLead, onScheduleVisit }: LeadsPageProps) => {
             >
               <RefreshCw className={cn("w-5 h-5", isRefreshing && "animate-spin")} />
             </Button>
-            {onAddLead && (
-              <Button
-                size="icon"
-                onClick={onAddLead}
-                className="h-9 w-9 rounded-full"
-              >
-                <Plus className="w-5 h-5" />
-              </Button>
-            )}
           </div>
         </div>
         

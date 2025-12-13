@@ -1,5 +1,6 @@
 import { FileText, Calendar, Camera, ClipboardList, Phone, MapPin, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { TabType } from '@/types';
 
 export type QuickActionType = 'lead' | 'visita' | 'imovel' | 'proposta' | 'ligacao' | 'checkin' | null;
 
@@ -7,6 +8,7 @@ interface QuickActionsSheetProps {
   isOpen: boolean;
   onClose: () => void;
   onActionSelect?: (action: QuickActionType) => void;
+  currentTab?: TabType;
 }
 
 const actions: { icon: typeof FileText; label: string; color: string; iconColor?: string; action: QuickActionType }[] = [
@@ -18,7 +20,16 @@ const actions: { icon: typeof FileText; label: string; color: string; iconColor?
   { icon: MapPin, label: 'Check-in Visita', color: 'bg-destructive', action: 'checkin' },
 ];
 
-export const QuickActionsSheet = ({ isOpen, onClose, onActionSelect }: QuickActionsSheetProps) => {
+// Mapeamento de ações relevantes por página
+const actionsByTab: Record<TabType, QuickActionType[]> = {
+  home: ['lead', 'visita', 'imovel', 'proposta', 'ligacao', 'checkin'],
+  leads: ['lead', 'visita', 'ligacao'],
+  imoveis: ['imovel', 'visita'],
+  agenda: ['visita', 'checkin', 'ligacao'],
+  perfil: [],
+};
+
+export const QuickActionsSheet = ({ isOpen, onClose, onActionSelect, currentTab = 'home' }: QuickActionsSheetProps) => {
   if (!isOpen) return null;
 
   const handleAction = (action: QuickActionType) => {
@@ -27,6 +38,11 @@ export const QuickActionsSheet = ({ isOpen, onClose, onActionSelect }: QuickActi
       onActionSelect(action);
     }
   };
+
+  // Filtrar ações baseado na página atual
+  const filteredActions = actions.filter(a => 
+    actionsByTab[currentTab]?.includes(a.action)
+  );
   
   return (
     <>
@@ -57,7 +73,7 @@ export const QuickActionsSheet = ({ isOpen, onClose, onActionSelect }: QuickActi
           
           {/* Actions Grid */}
           <div className="px-5 pb-8 grid grid-cols-3 gap-4">
-            {actions.map((action) => (
+            {filteredActions.map((action) => (
               <button
                 key={action.label}
                 onClick={() => handleAction(action.action)}

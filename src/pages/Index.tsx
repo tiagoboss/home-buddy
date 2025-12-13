@@ -62,7 +62,6 @@ const Index = () => {
       case 'leads':
         return (
           <LeadsPage 
-            onAddLead={() => setActiveForm('lead')}
             onScheduleVisit={() => setActiveForm('visita')}
           />
         );
@@ -104,8 +103,10 @@ const Index = () => {
           </div>
         </div>
         
-        {/* Floating Action Button */}
-        <FloatingActionButton onClick={() => setIsQuickActionsOpen(true)} isOpen={isQuickActionsOpen} />
+        {/* Floating Action Button - ocultar no perfil */}
+        {activeTab !== 'perfil' && (
+          <FloatingActionButton onClick={() => setIsQuickActionsOpen(true)} isOpen={isQuickActionsOpen} />
+        )}
         
         {/* Fixed Bottom Elements */}
         <TabBar 
@@ -119,6 +120,7 @@ const Index = () => {
           isOpen={isQuickActionsOpen}
           onClose={() => setIsQuickActionsOpen(false)}
           onActionSelect={handleActionSelect}
+          currentTab={activeTab}
         />
 
         {/* Notifications Sheet */}
