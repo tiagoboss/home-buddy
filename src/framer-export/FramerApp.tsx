@@ -1,5 +1,4 @@
 import * as React from "react"
-import { addPropertyControls, ControlType } from "framer"
 
 // ==================== TYPES ====================
 type TabType = "home" | "leads" | "agenda" | "perfil"
@@ -180,4 +179,3 @@ export default function FramerApp() {
 }
 
 FramerApp.defaultProps = { width: 390, height: 844 }
-addPropertyControls(FramerApp, {})
