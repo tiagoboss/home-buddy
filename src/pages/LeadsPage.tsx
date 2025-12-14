@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Filter, Loader2, RefreshCw } from 'lucide-react';
+import { Search, Filter, RefreshCw } from 'lucide-react';
 import { SwipeableLeadCard } from '@/components/leads/SwipeableLeadCard';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useLeads, Lead } from '@/hooks/useLeads';
@@ -24,7 +24,7 @@ interface LeadsPageProps {
 }
 
 export const LeadsPage = ({ onScheduleVisit, onBack, onSelectLead }: LeadsPageProps) => {
-  const { leads, loading, fetchLeads, deleteLead } = useLeads();
+  const { leads, fetchLeads, deleteLead } = useLeads();
   const [activeFilter, setActiveFilter] = useState('todos');
   const [searchQuery, setSearchQuery] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -113,37 +113,29 @@ export const LeadsPage = ({ onScheduleVisit, onBack, onSelectLead }: LeadsPagePr
       
       {/* Leads List */}
       <main className="px-4 py-4 animate-fade-in">
-        {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          </div>
-        ) : (
-          <>
-            <div className="space-y-2">
-              {filteredLeads.map((lead) => (
-                <SwipeableLeadCard
-                  key={lead.id}
-                  lead={lead}
-                  onClick={() => onSelectLead?.(lead)}
-                  onDelete={() => deleteLead(lead.id)}
-                />
-              ))}
+        <div className="space-y-2">
+          {filteredLeads.map((lead) => (
+            <SwipeableLeadCard
+              key={lead.id}
+              lead={lead}
+              onClick={() => onSelectLead?.(lead)}
+              onDelete={() => deleteLead(lead.id)}
+            />
+          ))}
+        </div>
+        
+        {filteredLeads.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
+              <Filter className="w-8 h-8 text-muted-foreground" />
             </div>
-            
-            {filteredLeads.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
-                  <Filter className="w-8 h-8 text-muted-foreground" />
-                </div>
-                <p className="text-foreground font-medium">Nenhum lead encontrado</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {leads.length === 0 
-                    ? 'Adicione seu primeiro lead clicando no botão +' 
-                    : 'Tente ajustar seus filtros'}
-                </p>
-              </div>
-            )}
-          </>
+            <p className="text-foreground font-medium">Nenhum lead encontrado</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              {leads.length === 0 
+                ? 'Adicione seu primeiro lead clicando no botão +' 
+                : 'Tente ajustar seus filtros'}
+            </p>
+          </div>
         )}
       </main>
     </div>
