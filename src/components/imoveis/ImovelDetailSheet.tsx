@@ -156,7 +156,7 @@ export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite, onSched
   if (!isOpen) return null;
 
   return (
-    <div className="absolute inset-0 z-50 flex flex-col">
+    <div className="fixed inset-0 z-50 flex flex-col">
       {/* Overlay */}
       <div
         className="absolute inset-0 bg-black/50"
