@@ -201,7 +201,7 @@ export const ImoveisPage = ({ onBack }: ImoveisPageProps) => {
   }
 
   return (
-    <div className="px-4 pt-4 pb-4">
+    <div className="px-4 pt-4 pb-4 animate-fade-in">
       {/* Header */}
       <div className="mb-4">
         <PageHeader title="Imóveis" onBack={onBack} />
