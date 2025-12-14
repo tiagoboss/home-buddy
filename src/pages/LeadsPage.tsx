@@ -113,7 +113,7 @@ export const LeadsPage = ({ onScheduleVisit, onBack }: LeadsPageProps) => {
       </header>
       
       {/* Leads List */}
-      <main className="px-4 py-4">
+      <main className="px-4 py-4 animate-fade-in">
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />

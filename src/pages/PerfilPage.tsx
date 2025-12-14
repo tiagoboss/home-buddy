@@ -91,7 +91,7 @@ export const PerfilPage = ({ onBack }: PerfilPageProps) => {
   const totalReviews = 32;
 
   return (
-    <div className="bg-background pb-4">
+    <div className="bg-background pb-4 animate-fade-in">
       {/* Header */}
       <header className="px-4 pt-4 pb-4">
         <PageHeader title="Meu Perfil" onBack={onBack} />

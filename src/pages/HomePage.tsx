@@ -53,7 +53,7 @@ export const HomePage = ({ onTabChange }: HomePageProps) => {
   
   return (
     <div className="bg-background">
-      <main className="py-4 space-y-5">
+      <main className="py-4 space-y-5 animate-fade-in">
         {/* KPIs */}
         <section className="px-4">
           <div className="flex gap-2.5 overflow-x-auto pb-2 hide-scrollbar snap-x-mandatory scroll-pl-0 -mr-4 pr-4">
