@@ -4,7 +4,6 @@ import { useFavoritos } from '@/hooks/useFavoritos';
 import { imoveis as mockImoveis } from '@/data/mockData';
 import { ImovelFilters } from '@/components/imoveis/ImovelFilters';
 import { SwipeableImovelCard } from '@/components/imoveis/SwipeableImovelCard';
-import { ImovelDetailSheet } from '@/components/imoveis/ImovelDetailSheet';
 import { ImoveisEmptyState } from '@/components/imoveis/ImoveisEmptyState';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { VisitaForm } from '@/components/forms/VisitaForm';
@@ -15,9 +14,10 @@ import { useAuth } from '@/hooks/useAuth';
 
 interface ImoveisPageProps {
   onBack?: () => void;
+  onSelectImovel?: (imovel: ImovelType) => void;
 }
 
-export const ImoveisPage = ({ onBack }: ImoveisPageProps) => {
+export const ImoveisPage = ({ onBack, onSelectImovel }: ImoveisPageProps) => {
   const { user } = useAuth();
   const { imoveis: dbImoveis, loading, updateImovel } = useImoveis();
   const { isFavorito, toggleFavorito } = useFavoritos();
@@ -28,7 +28,6 @@ export const ImoveisPage = ({ onBack }: ImoveisPageProps) => {
   const [sortBy, setSortBy] = useState('recentes');
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [showFavorites, setShowFavorites] = useState(false);
-  const [selectedImovel, setSelectedImovel] = useState<ImovelType | null>(null);
   
   // Visita form state
   const [visitaFormOpen, setVisitaFormOpen] = useState(false);
@@ -139,15 +138,8 @@ export const ImoveisPage = ({ onBack }: ImoveisPageProps) => {
   const handleFavorite = async (imovel: ImovelType) => {
     if (isUsingMockData) {
       toggleFavorito(imovel.id);
-      // Update selected imovel if it's the same
-      if (selectedImovel?.id === imovel.id) {
-        setSelectedImovel({ ...imovel, favorito: !imovel.favorito });
-      }
     } else {
       await updateImovel(imovel.id, { favorito: !imovel.favorito });
-      if (selectedImovel?.id === imovel.id) {
-        setSelectedImovel({ ...imovel, favorito: !imovel.favorito });
-      }
     }
   };
 
@@ -175,7 +167,6 @@ export const ImoveisPage = ({ onBack }: ImoveisPageProps) => {
     if (dbImovel) {
       setEditImovelData(dbImovel);
       setEditFormOpen(true);
-      setSelectedImovel(null);
     }
   };
 
@@ -234,7 +225,7 @@ export const ImoveisPage = ({ onBack }: ImoveisPageProps) => {
             <SwipeableImovelCard
               key={imovel.id}
               imovel={imovel}
-              onClick={() => setSelectedImovel(imovel)}
+              onClick={() => onSelectImovel?.(imovel)}
               onFavorite={() => handleFavorite(imovel)}
               onSendToClient={() => handleSendToClient(imovel)}
               onScheduleVisit={() => handleScheduleVisit(imovel)}
@@ -242,21 +233,6 @@ export const ImoveisPage = ({ onBack }: ImoveisPageProps) => {
             />
           ))}
         </div>
-      )}
-
-      {/* Detail Sheet */}
-      {selectedImovel && (
-        <ImovelDetailSheet
-          imovel={selectedImovel}
-          isOpen={!!selectedImovel}
-          onClose={() => setSelectedImovel(null)}
-          onFavorite={() => handleFavorite(selectedImovel)}
-          onScheduleVisit={() => {
-            setSelectedImovel(null);
-            handleScheduleVisit(selectedImovel);
-          }}
-          onEdit={user && !isUsingMockData ? () => handleEdit(selectedImovel) : undefined}
-        />
       )}
 
       {/* Visita Form */}
@@ -271,7 +247,6 @@ export const ImoveisPage = ({ onBack }: ImoveisPageProps) => {
         isOpen={editFormOpen}
         onClose={handleCloseEditForm}
         editData={editImovelData}
-        onDeleted={() => setSelectedImovel(null)}
       />
     </div>
   );
