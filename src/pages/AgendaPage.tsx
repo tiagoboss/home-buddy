@@ -3,18 +3,17 @@ import { ChevronLeft, ChevronRight, Loader2, CalendarDays } from 'lucide-react';
 import { useCompromissos, Compromisso } from '@/hooks/useCompromissos';
 import { SwipeableCompromissoCard } from '@/components/agenda/SwipeableCompromissoCard';
 import { CompromissoDetailSheet } from '@/components/agenda/CompromissoDetailSheet';
-import { AgendaEmptyState } from '@/components/agenda/AgendaEmptyState';
 import { AgendaWeekView } from '@/components/agenda/AgendaWeekView';
 import { AgendaMonthView } from '@/components/agenda/AgendaMonthView';
 import { RescheduleSheet } from '@/components/agenda/RescheduleSheet';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { VisitaForm } from '@/components/forms/VisitaForm';
 import { cn } from '@/lib/utils';
-import { format, isSameDay, parseISO, startOfWeek, addDays, isToday, addMonths, subMonths } from 'date-fns';
+import { format, isSameDay, parseISO, isToday, addMonths, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
 
-const views = ['Dia', 'Semana', 'Mês'];
+const views = ['Semana', 'Mês'];
 const SWIPE_THRESHOLD = 50;
 
 interface AgendaPageProps {
@@ -22,7 +21,7 @@ interface AgendaPageProps {
 }
 
 export const AgendaPage = ({ onBack }: AgendaPageProps) => {
-  const [activeView, setActiveView] = useState('Dia');
+  const [activeView, setActiveView] = useState('Semana');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedCompromisso, setSelectedCompromisso] = useState<Compromisso | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -36,37 +35,12 @@ export const AgendaPage = ({ onBack }: AgendaPageProps) => {
   
   const { compromissos, loading, updateCompromisso } = useCompromissos();
   
-  // Generate week days starting from the week of selected date
-  const weekDays = useMemo(() => {
-    const start = startOfWeek(selectedDate, { weekStartsOn: 0 }); // Sunday
-    return Array.from({ length: 7 }, (_, i) => addDays(start, i));
-  }, [selectedDate]);
-
-  // Count compromissos per day for the week
-  const getCompromissosCountForDay = (date: Date) => {
-    return compromissos.filter(c => isSameDay(parseISO(c.data), date)).length;
-  };
-  
   // Filter compromissos for selected date (sorted by time)
   const filteredCompromissos = useMemo(() => {
     return compromissos
       .filter(c => isSameDay(parseISO(c.data), selectedDate))
       .sort((a, b) => a.hora.localeCompare(b.hora));
   }, [compromissos, selectedDate]);
-  
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('pt-BR', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-    });
-  };
-  
-  const navigateWeek = (direction: 'prev' | 'next') => {
-    const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() + (direction === 'next' ? 7 : -7));
-    setSelectedDate(newDate);
-  };
 
   const navigateMonth = (direction: 'prev' | 'next') => {
     setSelectedDate(direction === 'next' ? addMonths(selectedDate, 1) : subMonths(selectedDate, 1));
@@ -77,7 +51,7 @@ export const AgendaPage = ({ onBack }: AgendaPageProps) => {
     toast.success('Voltando para hoje');
   };
 
-  // Swipe handlers for week navigation
+  // Swipe handlers for month navigation
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
     isSwiping.current = true;
@@ -87,16 +61,16 @@ export const AgendaPage = ({ onBack }: AgendaPageProps) => {
     if (!isSwiping.current) return;
     const currentX = e.touches[0].clientX;
     const diff = currentX - touchStartX.current;
-    setSwipeOffset(diff * 0.3); // Dampen the offset for visual feedback
+    setSwipeOffset(diff * 0.3);
   };
 
   const handleTouchEnd = () => {
     if (!isSwiping.current) return;
     
     if (swipeOffset > SWIPE_THRESHOLD) {
-      activeView === 'Mês' ? navigateMonth('prev') : navigateWeek('prev');
+      navigateMonth('prev');
     } else if (swipeOffset < -SWIPE_THRESHOLD) {
-      activeView === 'Mês' ? navigateMonth('next') : navigateWeek('next');
+      navigateMonth('next');
     }
     
     setSwipeOffset(0);
@@ -161,7 +135,7 @@ export const AgendaPage = ({ onBack }: AgendaPageProps) => {
   
   return (
     <div className="min-h-screen bg-background content-safe">
-      {/* Header */}
+      {/* Header - Simplified */}
       <header className="sticky top-0 z-40 glassmorphism px-4 py-3">
         <div className="flex items-center justify-between mb-3">
           <PageHeader title="Agenda" onBack={onBack} />
@@ -177,90 +151,6 @@ export const AgendaPage = ({ onBack }: AgendaPageProps) => {
             </button>
           )}
         </div>
-        
-        {/* Week Mini Calendar with Swipe - Only for Day view */}
-        {activeView === 'Dia' && (
-          <div 
-            className="flex items-center justify-between mb-3"
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-          >
-            <button 
-              onClick={() => navigateWeek('prev')}
-              className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center animate-scale-press"
-            >
-              <ChevronLeft className="w-4 h-4 text-foreground" />
-            </button>
-            
-            <div 
-              className="flex gap-1.5 flex-1 justify-center transition-transform duration-150"
-              style={{ transform: `translateX(${swipeOffset}px)` }}
-            >
-              {weekDays.map((day) => {
-                const count = getCompromissosCountForDay(day);
-                const isSelected = isSameDay(day, selectedDate);
-                const isTodayDate = isToday(day);
-                
-                return (
-                  <button
-                    key={day.toISOString()}
-                    onClick={() => setSelectedDate(day)}
-                    className={cn(
-                      "flex flex-col items-center py-2 px-2.5 rounded-xl transition-all duration-200 animate-scale-press min-w-[40px]",
-                      isSelected 
-                        ? "bg-primary text-primary-foreground" 
-                        : isTodayDate 
-                          ? "bg-primary/20" 
-                          : "bg-secondary"
-                    )}
-                  >
-                    <span className={cn(
-                      "text-[10px] font-medium uppercase",
-                      isSelected ? "text-primary-foreground" : "text-muted-foreground"
-                    )}>
-                      {format(day, 'EEE', { locale: ptBR }).slice(0, 3)}
-                    </span>
-                    <span className={cn(
-                      "text-sm font-semibold",
-                      isSelected ? "text-primary-foreground" : "text-foreground"
-                    )}>
-                      {format(day, 'd')}
-                    </span>
-                    {/* Indicator dots */}
-                    <div className="flex gap-0.5 mt-1 h-1.5">
-                      {count > 0 && (
-                        <div className={cn(
-                          "w-1.5 h-1.5 rounded-full",
-                          isSelected ? "bg-primary-foreground" : "bg-primary"
-                        )} />
-                      )}
-                      {count > 2 && (
-                        <div className={cn(
-                          "w-1.5 h-1.5 rounded-full",
-                          isSelected ? "bg-primary-foreground/60" : "bg-primary/60"
-                        )} />
-                      )}
-                      {count > 4 && (
-                        <div className={cn(
-                          "w-1.5 h-1.5 rounded-full",
-                          isSelected ? "bg-primary-foreground/40" : "bg-primary/40"
-                        )} />
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-            
-            <button 
-              onClick={() => navigateWeek('next')}
-              className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center animate-scale-press"
-            >
-              <ChevronRight className="w-4 h-4 text-foreground" />
-            </button>
-          </div>
-        )}
 
         {/* Month Navigation - Only for Month view */}
         {activeView === 'Mês' && (
@@ -292,25 +182,6 @@ export const AgendaPage = ({ onBack }: AgendaPageProps) => {
             >
               <ChevronRight className="w-4 h-4 text-foreground" />
             </button>
-          </div>
-        )}
-
-        {/* Selected Date Info - Only for Day view */}
-        {activeView === 'Dia' && (
-          <div className="flex items-center justify-center mb-3">
-            <div className="flex flex-col items-center">
-              <p className="text-sm font-medium text-foreground capitalize">
-                {formatDate(selectedDate)}
-              </p>
-              <span className={cn(
-                "text-xs font-medium px-2 py-0.5 rounded-full mt-1",
-                filteredCompromissos.length > 0 
-                  ? "bg-primary/20 text-primary" 
-                  : "bg-muted text-muted-foreground"
-              )}>
-                {filteredCompromissos.length} {filteredCompromissos.length === 1 ? 'compromisso' : 'compromissos'}
-              </span>
-            </div>
           </div>
         )}
         
@@ -345,8 +216,10 @@ export const AgendaPage = ({ onBack }: AgendaPageProps) => {
             selectedDate={selectedDate}
             onSelectDate={setSelectedDate}
             onSelectCompromisso={handleCardClick}
+            onConfirm={handleConfirm}
+            onCancel={handleCancel}
           />
-        ) : activeView === 'Mês' ? (
+        ) : (
           <>
             <AgendaMonthView
               compromissos={compromissos}
@@ -377,25 +250,6 @@ export const AgendaPage = ({ onBack }: AgendaPageProps) => {
               )}
             </div>
           </>
-        ) : filteredCompromissos.length === 0 ? (
-          <AgendaEmptyState onScheduleVisit={() => setIsVisitaFormOpen(true)} />
-        ) : (
-          <div className="space-y-3">
-            {filteredCompromissos.map((compromisso, index) => (
-              <div 
-                key={compromisso.id}
-                style={{ animationDelay: `${index * 50}ms` }}
-                className="animate-fade-in"
-              >
-                <SwipeableCompromissoCard
-                  compromisso={compromisso}
-                  onClick={() => handleCardClick(compromisso)}
-                  onConfirm={() => handleConfirm(compromisso)}
-                  onCancel={() => handleCancel(compromisso)}
-                />
-              </div>
-            ))}
-          </div>
         )}
       </main>
 

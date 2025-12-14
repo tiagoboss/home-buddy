@@ -1,6 +1,6 @@
 import { Compromisso } from '@/hooks/useCompromissos';
 import { cn } from '@/lib/utils';
-import { format, isSameDay, parseISO, startOfWeek, addDays } from 'date-fns';
+import { format, isSameDay, parseISO, startOfWeek, addDays, isToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { SwipeableCompromissoCard } from './SwipeableCompromissoCard';
 
@@ -12,12 +12,6 @@ interface AgendaWeekViewProps {
   onConfirm?: (compromisso: Compromisso) => void;
   onCancel?: (compromisso: Compromisso) => void;
 }
-
-const tipoColors: Record<string, string> = {
-  visita: 'bg-success',
-  ligacao: 'bg-info',
-  reuniao: 'bg-warning',
-};
 
 export const AgendaWeekView = ({ 
   compromissos, 
@@ -40,23 +34,24 @@ export const AgendaWeekView = ({
 
   return (
     <div className="space-y-4">
-      {/* Day Selector - Horizontal */}
-      <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+      {/* Compact Day Selector */}
+      <div className="flex gap-1.5 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
         {weekDays.map((day) => {
           const dayCompromissos = getCompromissosForDay(day);
           const isSelected = isSameDay(day, selectedDate);
-          const isToday = isSameDay(day, new Date());
+          const isTodayDate = isToday(day);
 
           return (
             <button
               key={day.toISOString()}
               onClick={() => onSelectDate(day)}
               className={cn(
-                "flex-shrink-0 flex flex-col items-center justify-center w-12 h-16 rounded-2xl transition-all duration-200",
+                "flex-shrink-0 flex flex-col items-center justify-center w-11 h-14 rounded-xl transition-all duration-200",
                 isSelected 
-                  ? "bg-primary text-primary-foreground shadow-lg scale-105" 
-                  : "bg-secondary/50 hover:bg-secondary",
-                isToday && !isSelected && "ring-2 ring-primary/50"
+                  ? "bg-primary text-primary-foreground shadow-md" 
+                  : isTodayDate
+                    ? "bg-primary/20"
+                    : "bg-secondary/50 hover:bg-secondary"
               )}
             >
               <span className={cn(
@@ -66,31 +61,23 @@ export const AgendaWeekView = ({
                 {format(day, 'EEE', { locale: ptBR }).slice(0, 3)}
               </span>
               <span className={cn(
-                "text-lg font-bold",
+                "text-base font-bold",
                 isSelected ? "text-primary-foreground" : "text-foreground"
               )}>
                 {format(day, 'd')}
               </span>
-              {/* Dots indicator */}
+              {/* Discreet dots indicator */}
               {dayCompromissos.length > 0 && (
                 <div className="flex gap-0.5 mt-0.5">
-                  {dayCompromissos.slice(0, 3).map((c, i) => (
+                  {dayCompromissos.slice(0, 3).map((_, i) => (
                     <div 
                       key={i} 
                       className={cn(
-                        "w-1.5 h-1.5 rounded-full",
-                        isSelected ? "bg-primary-foreground/70" : tipoColors[c.tipo] || 'bg-muted'
+                        "w-1 h-1 rounded-full",
+                        isSelected ? "bg-primary-foreground/60" : "bg-primary/60"
                       )}
                     />
                   ))}
-                  {dayCompromissos.length > 3 && (
-                    <span className={cn(
-                      "text-[8px] font-medium ml-0.5",
-                      isSelected ? "text-primary-foreground/70" : "text-muted-foreground"
-                    )}>
-                      +{dayCompromissos.length - 3}
-                    </span>
-                  )}
                 </div>
               )}
             </button>
@@ -98,25 +85,15 @@ export const AgendaWeekView = ({
         })}
       </div>
 
-      {/* Selected Day Header */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-foreground">
-          {format(selectedDate, "EEEE, d 'de' MMMM", { locale: ptBR })}
-        </h3>
-        <span className="text-xs text-muted-foreground">
-          {selectedDayCompromissos.length} compromisso{selectedDayCompromissos.length !== 1 ? 's' : ''}
-        </span>
-      </div>
-
       {/* Appointments List */}
-      <div className="space-y-3">
+      <div className="space-y-2">
         {selectedDayCompromissos.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="w-16 h-16 rounded-full bg-secondary/50 flex items-center justify-center mb-3">
-              <span className="text-2xl">📅</span>
+            <div className="w-14 h-14 rounded-full bg-secondary/50 flex items-center justify-center mb-3">
+              <span className="text-xl">📅</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Nenhum compromisso neste dia
+              Nenhum compromisso
             </p>
             <p className="text-xs text-muted-foreground/70 mt-1">
               Toque em + para agendar
