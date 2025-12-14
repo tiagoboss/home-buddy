@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { useCompromissos, Compromisso } from '@/hooks/useCompromissos';
 import { SwipeableCompromissoCard } from '@/components/agenda/SwipeableCompromissoCard';
@@ -12,6 +12,7 @@ import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
 
 const views = ['Dia', 'Semana', 'Mês'];
+const SWIPE_THRESHOLD = 50;
 
 interface AgendaPageProps {
   onBack?: () => void;
@@ -23,6 +24,11 @@ export const AgendaPage = ({ onBack }: AgendaPageProps) => {
   const [selectedCompromisso, setSelectedCompromisso] = useState<Compromisso | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isVisitaFormOpen, setIsVisitaFormOpen] = useState(false);
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  
+  // Touch handling refs
+  const touchStartX = useRef(0);
+  const isSwiping = useRef(false);
   
   const { compromissos, loading, updateCompromisso } = useCompromissos();
   
@@ -55,6 +61,32 @@ export const AgendaPage = ({ onBack }: AgendaPageProps) => {
     const newDate = new Date(selectedDate);
     newDate.setDate(newDate.getDate() + (direction === 'next' ? 7 : -7));
     setSelectedDate(newDate);
+  };
+
+  // Swipe handlers for week navigation
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    isSwiping.current = true;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isSwiping.current) return;
+    const currentX = e.touches[0].clientX;
+    const diff = currentX - touchStartX.current;
+    setSwipeOffset(diff * 0.3); // Dampen the offset for visual feedback
+  };
+
+  const handleTouchEnd = () => {
+    if (!isSwiping.current) return;
+    
+    if (swipeOffset > SWIPE_THRESHOLD) {
+      navigateWeek('prev');
+    } else if (swipeOffset < -SWIPE_THRESHOLD) {
+      navigateWeek('next');
+    }
+    
+    setSwipeOffset(0);
+    isSwiping.current = false;
   };
 
   const handleCardClick = (compromisso: Compromisso) => {
@@ -103,8 +135,13 @@ export const AgendaPage = ({ onBack }: AgendaPageProps) => {
       <header className="sticky top-0 z-40 glassmorphism px-4 py-3">
         <PageHeader title="Agenda" onBack={onBack} />
         
-        {/* Week Mini Calendar */}
-        <div className="flex items-center justify-between mb-3">
+        {/* Week Mini Calendar with Swipe */}
+        <div 
+          className="flex items-center justify-between mb-3"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           <button 
             onClick={() => navigateWeek('prev')}
             className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center animate-scale-press"
@@ -112,7 +149,10 @@ export const AgendaPage = ({ onBack }: AgendaPageProps) => {
             <ChevronLeft className="w-4 h-4 text-foreground" />
           </button>
           
-          <div className="flex gap-1.5 flex-1 justify-center">
+          <div 
+            className="flex gap-1.5 flex-1 justify-center transition-transform duration-150"
+            style={{ transform: `translateX(${swipeOffset}px)` }}
+          >
             {weekDays.map((day) => {
               const count = getCompromissosCountForDay(day);
               const isSelected = isSameDay(day, selectedDate);
