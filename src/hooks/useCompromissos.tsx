@@ -378,7 +378,24 @@ export const useCompromissos = () => {
   const createCompromisso = async (
     compromisso: Omit<Compromisso, 'id' | 'user_id' | 'created_at' | 'updated_at'>
   ) => {
-    if (!user) return { error: 'Not authenticated' };
+    // If using mock data, create locally
+    if (useMockData || !user) {
+      const newCompromisso: Compromisso = {
+        ...compromisso,
+        id: `mock-${Date.now()}`,
+        user_id: 'demo',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      
+      setCompromissos((prev) => [...prev, newCompromisso].sort((a, b) => {
+        const dateA = new Date(`${a.data}T${a.hora}`);
+        const dateB = new Date(`${b.data}T${b.hora}`);
+        return dateA.getTime() - dateB.getTime();
+      }));
+      
+      return { data: newCompromisso, error: null };
+    }
 
     const { data, error } = await supabase
       .from('compromissos')
@@ -398,6 +415,19 @@ export const useCompromissos = () => {
   };
 
   const updateCompromisso = async (id: string, updates: Partial<Compromisso>) => {
+    // If using mock data, update locally only
+    if (useMockData) {
+      setCompromissos((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, ...updates, updated_at: new Date().toISOString() } : c))
+          .sort((a, b) => {
+            const dateA = new Date(`${a.data}T${a.hora}`);
+            const dateB = new Date(`${b.data}T${b.hora}`);
+            return dateA.getTime() - dateB.getTime();
+          })
+      );
+      return { error: null };
+    }
+
     const { error } = await supabase
       .from('compromissos')
       .update(updates)
@@ -413,6 +443,12 @@ export const useCompromissos = () => {
   };
 
   const deleteCompromisso = async (id: string) => {
+    // If using mock data, delete locally only
+    if (useMockData) {
+      setCompromissos((prev) => prev.filter((c) => c.id !== id));
+      return { error: null };
+    }
+
     const { error } = await supabase.from('compromissos').delete().eq('id', id);
 
     if (!error) {

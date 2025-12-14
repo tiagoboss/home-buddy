@@ -1,5 +1,5 @@
 import { Compromisso } from '@/hooks/useCompromissos';
-import { Home, Phone, Users, MapPin, MessageCircle, X, Check, Calendar, Navigation } from 'lucide-react';
+import { Home, Phone, Users, MapPin, MessageCircle, X, Check, Calendar, Navigation, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -12,6 +12,7 @@ interface CompromissoDetailSheetProps {
   onConfirm?: () => void;
   onCancel?: () => void;
   onComplete?: () => void;
+  onReschedule?: () => void;
 }
 
 const tipoConfig: Record<string, { icon: typeof Home; color: string; bgColor: string; label: string }> = {
@@ -36,7 +37,8 @@ export const CompromissoDetailSheet = ({
   onClose,
   onConfirm,
   onCancel,
-  onComplete
+  onComplete,
+  onReschedule
 }: CompromissoDetailSheetProps) => {
   const [dragOffset, setDragOffset] = useState(0);
   const [isClosing, setIsClosing] = useState(false);
@@ -115,6 +117,8 @@ export const CompromissoDetailSheet = ({
       window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank');
     }
   };
+
+  const canReschedule = compromisso.status !== 'realizado' && compromisso.status !== 'cancelado';
 
   return (
     <>
@@ -233,6 +237,17 @@ export const CompromissoDetailSheet = ({
                 Sem telefone do lead vinculado
               </p>
             </div>
+          )}
+
+          {/* Reschedule Button */}
+          {canReschedule && onReschedule && (
+            <button 
+              onClick={onReschedule}
+              className="w-full flex items-center justify-center gap-2 p-4 bg-secondary text-foreground rounded-xl animate-scale-press mb-4"
+            >
+              <Clock className="w-5 h-5" />
+              <span className="font-semibold">Reagendar</span>
+            </button>
           )}
 
           {/* Status Actions */}
