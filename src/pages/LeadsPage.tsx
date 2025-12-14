@@ -112,18 +112,13 @@ export const LeadsPage = ({ onScheduleVisit, onSelectLead }: LeadsPageProps) => 
       {/* Leads List */}
       <main className="px-4 py-4">
         <div className="space-y-2">
-          {filteredLeads.map((lead, index) => (
-            <div
+          {filteredLeads.map((lead) => (
+            <SwipeableLeadCard
               key={lead.id}
-              className="animate-fade-in"
-              style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'backwards' }}
-            >
-              <SwipeableLeadCard
-                lead={lead}
-                onClick={() => onSelectLead?.(lead)}
-                onDelete={() => deleteLead(lead.id)}
-              />
-            </div>
+              lead={lead}
+              onClick={() => onSelectLead?.(lead)}
+              onDelete={() => deleteLead(lead.id)}
+            />
           ))}
         </div>
         
