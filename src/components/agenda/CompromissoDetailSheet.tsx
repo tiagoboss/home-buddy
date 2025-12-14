@@ -155,7 +155,7 @@ export const CompromissoDetailSheet = ({
       <div 
         className={cn(
           "absolute bottom-0 left-0 right-0 z-50 bg-card rounded-t-3xl",
-          "max-h-[90%] flex flex-col touch-none",
+          "touch-none",
           !isClosing && dragOffset === 0 && "animate-slide-up-sheet",
           isClosing && "transition-transform duration-200 ease-out"
         )}
@@ -178,7 +178,7 @@ export const CompromissoDetailSheet = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto px-4 pb-6">
+        <div className="px-4 pb-8">
           {/* Header */}
           <div className="flex items-center gap-4 mb-6">
             <div className={cn(
