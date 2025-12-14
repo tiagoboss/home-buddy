@@ -1,14 +1,12 @@
 import { useState, useMemo } from 'react';
 import { useImoveis, Imovel as DbImovel, Modalidade } from '@/hooks/useImoveis';
 import { useFavoritos } from '@/hooks/useFavoritos';
-import { imoveis as mockImoveis } from '@/data/mockData';
 import { ImovelFilters } from '@/components/imoveis/ImovelFilters';
 import { SwipeableImovelCard } from '@/components/imoveis/SwipeableImovelCard';
 import { ImoveisEmptyState } from '@/components/imoveis/ImoveisEmptyState';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { VisitaForm } from '@/components/forms/VisitaForm';
 import { ImovelForm } from '@/components/forms/ImovelForm';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Imovel as ImovelType } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -19,7 +17,7 @@ interface ImoveisPageProps {
 
 export const ImoveisPage = ({ onBack, onSelectImovel }: ImoveisPageProps) => {
   const { user } = useAuth();
-  const { imoveis: dbImoveis, loading, updateImovel } = useImoveis();
+  const { imoveis: dbImoveis, updateImovel, isUsingMockData } = useImoveis();
   const { isFavorito, toggleFavorito } = useFavoritos();
   
   const [searchQuery, setSearchQuery] = useState('');
@@ -37,40 +35,33 @@ export const ImoveisPage = ({ onBack, onSelectImovel }: ImoveisPageProps) => {
   const [editFormOpen, setEditFormOpen] = useState(false);
   const [editImovelData, setEditImovelData] = useState<DbImovel | null>(null);
 
-  const isUsingMockData = dbImoveis.length === 0;
+  // isUsingMockData now comes from hook
 
-  // Use mock data if no db data
+  // Convert DB imoveis to ImovelType format
   const allImoveis: ImovelType[] = useMemo(() => {
-    if (!isUsingMockData) {
-      return dbImoveis.map(i => ({
-        id: i.id,
-        titulo: i.titulo,
-        tipo: i.tipo,
-        modalidade: i.modalidade,
-        preco: i.preco,
-        bairro: i.bairro || '',
-        cidade: i.cidade || '',
-        quartos: i.quartos,
-        banheiros: i.banheiros,
-        vagas: i.vagas,
-        area: i.area,
-        condominio: i.condominio || undefined,
-        iptu: i.iptu || undefined,
-        descricao: i.descricao || undefined,
-        caracteristicas: i.caracteristicas || undefined,
-        entrega: i.entrega || undefined,
-        construtora: i.construtora || undefined,
-        foto: i.foto || '',
-        novo: i.novo,
-        baixouPreco: i.baixou_preco,
-        favorito: i.favorito,
-        telefoneContato: i.telefone_contato || undefined,
-      }));
-    }
-    // Apply localStorage favorites to mock data
-    return mockImoveis.map(i => ({
-      ...i,
-      favorito: isFavorito(i.id),
+    return dbImoveis.map(i => ({
+      id: i.id,
+      titulo: i.titulo,
+      tipo: i.tipo,
+      modalidade: i.modalidade,
+      preco: i.preco,
+      bairro: i.bairro || '',
+      cidade: i.cidade || '',
+      quartos: i.quartos,
+      banheiros: i.banheiros,
+      vagas: i.vagas,
+      area: i.area,
+      condominio: i.condominio || undefined,
+      iptu: i.iptu || undefined,
+      descricao: i.descricao || undefined,
+      caracteristicas: i.caracteristicas || undefined,
+      entrega: i.entrega || undefined,
+      construtora: i.construtora || undefined,
+      foto: i.foto || '',
+      novo: i.novo,
+      baixouPreco: i.baixou_preco,
+      favorito: isUsingMockData ? isFavorito(i.id) : i.favorito,
+      telefoneContato: i.telefone_contato || undefined,
     }));
   }, [dbImoveis, isUsingMockData, isFavorito]);
 
@@ -180,16 +171,6 @@ export const ImoveisPage = ({ onBack, onSelectImovel }: ImoveisPageProps) => {
     setEditImovelData(null);
   };
 
-  if (loading) {
-    return (
-      <div className="px-4 pt-4 space-y-4">
-        <Skeleton className="h-10 w-full rounded-xl" />
-        <Skeleton className="h-8 w-full rounded-xl" />
-        <Skeleton className="h-64 w-full rounded-2xl" />
-        <Skeleton className="h-64 w-full rounded-2xl" />
-      </div>
-    );
-  }
 
   return (
     <div className="px-4 pt-4 pb-4 animate-fade-in relative">
