@@ -83,6 +83,7 @@ export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite, onSched
   };
 
   const handleShare = async () => {
+    const publicUrl = `${window.location.origin}/imovel/${imovel.id}`;
     const shareText = `Confira este imóvel: ${imovel.titulo} - ${formatCurrency(imovel.preco)}`;
     
     if (navigator.share) {
@@ -90,15 +91,15 @@ export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite, onSched
         await navigator.share({
           title: imovel.titulo,
           text: shareText,
-          url: window.location.href,
+          url: publicUrl,
         });
       } catch (err) {
         if ((err as Error).name !== 'AbortError') {
-          await copyToClipboard(shareText);
+          await copyToClipboard(publicUrl);
         }
       }
     } else {
-      await copyToClipboard(shareText);
+      await copyToClipboard(publicUrl);
     }
   };
 
