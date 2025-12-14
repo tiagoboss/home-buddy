@@ -87,7 +87,7 @@ export const PerfilPage = () => {
   const totalReviews = 32;
 
   return (
-    <div className="bg-background pb-4 transition-all duration-300 ease-out animate-fade-in">
+    <div className="bg-background pb-4 animate-slide-up-fade">
       {/* Header */}
       <header className="px-4 pt-4 pb-4">
         <PageHeader title="Meu Perfil" />

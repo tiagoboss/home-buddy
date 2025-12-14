@@ -207,10 +207,7 @@ export const AgendaPage = () => {
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         ) : (
-          <div className={cn(
-            "transition-all duration-300 ease-out",
-            activeView === 'Semana' ? "animate-fade-in" : "animate-fade-in"
-          )}>
+          <div className="animate-slide-up-fade">
             {activeView === 'Semana' ? (
               <AgendaWeekView
             compromissos={compromissos}

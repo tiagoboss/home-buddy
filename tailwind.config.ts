@@ -96,6 +96,10 @@ export default {
           from: { opacity: "0" },
           to: { opacity: "1" },
         },
+        "slide-up-fade": {
+          from: { opacity: "0", transform: "translateY(12px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
         "scale-in": {
           from: { transform: "scale(0.95)", opacity: "0" },
           to: { transform: "scale(1)", opacity: "1" },
@@ -111,6 +115,7 @@ export default {
         "slide-up-sheet": "slide-up-sheet 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         "slide-down-sheet": "slide-down-sheet 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         "fade-in": "fade-in 0.2s ease-out",
+        "slide-up-fade": "slide-up-fade 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         "scale-in": "scale-in 0.2s ease-out",
         "bounce-tab": "bounce-tab 0.2s ease-out",
       },
