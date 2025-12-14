@@ -101,9 +101,19 @@ export const AgendaPage = ({ onBack }: AgendaPageProps) => {
             <ChevronLeft className="w-5 h-5 text-foreground" />
           </button>
           
-          <p className="text-sm font-medium text-foreground capitalize">
-            {formatDate(selectedDate)}
-          </p>
+          <div className="flex flex-col items-center">
+            <p className="text-sm font-medium text-foreground capitalize">
+              {formatDate(selectedDate)}
+            </p>
+            <span className={cn(
+              "text-xs font-medium px-2 py-0.5 rounded-full mt-1",
+              filteredCompromissos.length > 0 
+                ? "bg-primary/20 text-primary" 
+                : "bg-muted text-muted-foreground"
+            )}>
+              {filteredCompromissos.length} {filteredCompromissos.length === 1 ? 'compromisso' : 'compromissos'}
+            </span>
+          </div>
           
           <button 
             onClick={() => navigateDate('next')}
