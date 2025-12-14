@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { TabBar } from '@/components/layout/TabBar';
 import { FloatingActionButton } from '@/components/layout/FloatingActionButton';
 import { QuickActionsSheet, QuickActionType } from '@/components/sheets/QuickActionsSheet';
@@ -95,9 +95,12 @@ const Index = () => {
           </div>
         )}
         
-        {/* Scrollable Content */}
+        {/* Scrollable Content with Tab Transition */}
         <div className="flex-1 overflow-y-auto pb-[100px]">
-          <div className="animate-fade-in">
+          <div 
+            key={activeTab}
+            className="animate-tab-transition"
+          >
             {renderContent()}
           </div>
         </div>
