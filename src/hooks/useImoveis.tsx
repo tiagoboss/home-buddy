@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { imoveis as mockImoveisData } from '@/data/mockData';
 
 export type Modalidade = 'venda' | 'locacao' | 'lancamento' | 'temporada';
 
@@ -33,31 +34,73 @@ export interface Imovel {
   updated_at: string;
 }
 
+// Convert mock data to Imovel format
+const convertMockImoveis = (): Imovel[] => {
+  return mockImoveisData.map(imovel => ({
+    id: imovel.id,
+    user_id: '',
+    titulo: imovel.titulo,
+    tipo: imovel.tipo,
+    modalidade: imovel.modalidade as Modalidade,
+    preco: imovel.preco,
+    bairro: imovel.bairro,
+    cidade: imovel.cidade,
+    quartos: imovel.quartos,
+    banheiros: imovel.banheiros || 1,
+    vagas: imovel.vagas,
+    area: imovel.area,
+    condominio: imovel.condominio || null,
+    iptu: imovel.iptu || null,
+    descricao: imovel.descricao || null,
+    caracteristicas: imovel.caracteristicas || null,
+    entrega: imovel.entrega || null,
+    construtora: imovel.construtora || null,
+    foto: imovel.foto,
+    fotos: null,
+    novo: imovel.novo,
+    baixou_preco: imovel.baixouPreco,
+    favorito: imovel.favorito,
+    telefone_contato: imovel.telefoneContato || null,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  }));
+};
+
 export const useImoveis = () => {
   const { user } = useAuth();
-  const [imoveis, setImoveis] = useState<Imovel[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Initialize with mock data immediately
+  const [imoveis, setImoveis] = useState<Imovel[]>(convertMockImoveis());
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isUsingMockData, setIsUsingMockData] = useState(true);
 
   const fetchImoveis = async () => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      
+      let query = supabase
         .from('imoveis')
         .select('*')
-        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
+      // If user is logged in, filter by user_id
+      if (user) {
+        query = query.eq('user_id', user.id);
+      }
+
+      const { data, error } = await query;
+
       if (error) throw error;
-      setImoveis(data as Imovel[]);
+      
+      // Only use DB data if we have results, otherwise keep mock data
+      if (data && data.length > 0) {
+        setImoveis(data as Imovel[]);
+        setIsUsingMockData(false);
+      }
     } catch (err: any) {
       console.error('Error fetching imoveis:', err);
       setError(err.message);
+      // Keep mock data on error
     } finally {
       setLoading(false);
     }
@@ -78,6 +121,7 @@ export const useImoveis = () => {
 
     if (!error && data) {
       setImoveis((prev) => [data as Imovel, ...prev]);
+      setIsUsingMockData(false);
     }
 
     return { data, error };
@@ -99,6 +143,12 @@ export const useImoveis = () => {
   };
 
   const deleteImovel = async (id: string) => {
+    // For mock data, just remove from state
+    if (isUsingMockData) {
+      setImoveis((prev) => prev.filter((i) => i.id !== id));
+      return { error: null };
+    }
+
     const { error } = await supabase.from('imoveis').delete().eq('id', id);
 
     if (!error) {
@@ -112,6 +162,7 @@ export const useImoveis = () => {
     imoveis,
     loading,
     error,
+    isUsingMockData,
     fetchImoveis,
     createImovel,
     updateImovel,
