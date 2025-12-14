@@ -1,51 +1,24 @@
-import { useState } from 'react';
 import { DollarSign, TrendingUp, Target, Clock, ChevronRight, FileText } from 'lucide-react';
 import { KPICard } from '@/components/ui/KPICard';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { CompromissoCard } from '@/components/home/CompromissoCard';
 import { LeadCard } from '@/components/home/LeadCard';
 import { ImovelCard } from '@/components/home/ImovelCard';
-import { CompromissoDetailSheet } from '@/components/agenda/CompromissoDetailSheet';
-import { LeadDetailSheet } from '@/components/leads/LeadDetailSheet';
-import { ImovelDetailSheet } from '@/components/imoveis/ImovelDetailSheet';
 import { corretor, compromissos, leads, imoveis } from '@/data/mockData';
 import { Compromisso as MockCompromisso, Lead as MockLead, Imovel, TabType } from '@/types';
-import { Compromisso as HookCompromisso } from '@/hooks/useCompromissos';
-import { useFavoritos } from '@/hooks/useFavoritos';
 import { usePropostas } from '@/hooks/usePropostas';
 
 interface HomePageProps {
   onTabChange?: (tab: TabType) => void;
+  onSelectCompromisso?: (compromisso: MockCompromisso) => void;
+  onSelectLead?: (lead: MockLead) => void;
+  onSelectImovel?: (imovel: Imovel) => void;
 }
 
-export const HomePage = ({ onTabChange }: HomePageProps) => {
+export const HomePage = ({ onTabChange, onSelectCompromisso, onSelectLead, onSelectImovel }: HomePageProps) => {
   const { propostas } = usePropostas();
   const hotLeads = leads.filter(l => l.status === 'quente' || l.status === 'negociacao');
   const todayCompromissos = compromissos.slice(0, 3);
-  
-  // Selected items for detail sheets
-  const [selectedCompromisso, setSelectedCompromisso] = useState<MockCompromisso | null>(null);
-  const [selectedLead, setSelectedLead] = useState<MockLead | null>(null);
-  const [selectedImovel, setSelectedImovel] = useState<Imovel | null>(null);
-  
-  // Convert mock compromisso to hook format
-  const convertToHookCompromisso = (c: MockCompromisso): HookCompromisso => ({
-    id: c.id,
-    user_id: '',
-    tipo: c.tipo,
-    data: c.data,
-    hora: c.hora,
-    cliente: c.cliente,
-    imovel: c.imovel || null,
-    endereco: c.endereco || null,
-    status: c.status,
-    lead_id: null,
-    lead: null,
-    created_at: c.data,
-    updated_at: c.data,
-  });
-  
-  const { isFavorito, toggleFavorito } = useFavoritos();
 
   // Propostas stats
   const propostasPendentes = propostas.filter(p => p.status === 'pendente').length;
@@ -131,7 +104,7 @@ export const HomePage = ({ onTabChange }: HomePageProps) => {
               <CompromissoCard 
                 key={c.id} 
                 compromisso={c} 
-                onClick={() => setSelectedCompromisso(c)}
+                onClick={() => onSelectCompromisso?.(c)}
               />
             ))}
           </div>
@@ -155,7 +128,7 @@ export const HomePage = ({ onTabChange }: HomePageProps) => {
                 key={lead.id} 
                 lead={lead} 
                 compact 
-                onClick={() => setSelectedLead(lead)}
+                onClick={() => onSelectLead?.(lead)}
               />
             ))}
           </div>
@@ -178,53 +151,12 @@ export const HomePage = ({ onTabChange }: HomePageProps) => {
               <ImovelCard 
                 key={imovel.id} 
                 imovel={imovel} 
-                onClick={() => setSelectedImovel(imovel)}
+                onClick={() => onSelectImovel?.(imovel)}
               />
             ))}
           </div>
         </section>
       </main>
-      
-      {/* Detail Sheets */}
-      <CompromissoDetailSheet
-        compromisso={selectedCompromisso ? convertToHookCompromisso(selectedCompromisso) : null}
-        isOpen={!!selectedCompromisso}
-        onClose={() => setSelectedCompromisso(null)}
-      />
-      
-      {selectedLead && (
-        <LeadDetailSheet
-          lead={{
-            id: selectedLead.id,
-            user_id: '',
-            nome: selectedLead.nome,
-            telefone: selectedLead.telefone,
-            email: selectedLead.email || null,
-            status: selectedLead.status as any,
-            interesse: selectedLead.interesse,
-            faixa_preco: null,
-            bairros: null,
-            ultimo_contato: selectedLead.ultimoContato,
-            avatar: selectedLead.avatar,
-            created_at: selectedLead.ultimoContato,
-            updated_at: selectedLead.ultimoContato,
-          }}
-          isOpen={!!selectedLead}
-          onClose={() => setSelectedLead(null)}
-        />
-      )}
-      
-      {selectedImovel && (
-        <ImovelDetailSheet
-          imovel={{
-            ...selectedImovel,
-            favorito: isFavorito(selectedImovel.id),
-          }}
-          isOpen={!!selectedImovel}
-          onClose={() => setSelectedImovel(null)}
-          onFavorite={() => toggleFavorito(selectedImovel.id)}
-        />
-      )}
     </div>
   );
 };
