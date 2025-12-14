@@ -1,8 +1,9 @@
 import { Compromisso } from '@/hooks/useCompromissos';
 import { cn } from '@/lib/utils';
-import { format, isSameDay, parseISO, startOfWeek, addDays, isToday } from 'date-fns';
+import { format, isSameDay, parseISO, addDays, isToday, startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { SwipeableCompromissoCard } from './SwipeableCompromissoCard';
+import { useRef, useEffect } from 'react';
 
 interface AgendaWeekViewProps {
   compromissos: Compromisso[];
@@ -21,8 +22,22 @@ export const AgendaWeekView = ({
   onConfirm,
   onCancel
 }: AgendaWeekViewProps) => {
-  const weekStart = startOfWeek(selectedDate, { weekStartsOn: 0 });
-  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const todayRef = useRef<HTMLButtonElement>(null);
+  
+  const today = startOfDay(new Date());
+  // Show 3 days before today + today + 10 days after = 14 days total
+  const daysToShow = Array.from({ length: 14 }, (_, i) => addDays(today, i - 3));
+
+  // Auto-scroll to today on mount
+  useEffect(() => {
+    if (todayRef.current && scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const todayButton = todayRef.current;
+      // Scroll to position today at the start of the visible area
+      container.scrollLeft = todayButton.offsetLeft - 16;
+    }
+  }, []);
 
   const getCompromissosForDay = (date: Date) => {
     return compromissos
@@ -35,8 +50,11 @@ export const AgendaWeekView = ({
   return (
     <div className="space-y-4">
       {/* Compact Day Selector */}
-      <div className="flex gap-1.5 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-        {weekDays.map((day) => {
+      <div 
+        ref={scrollContainerRef}
+        className="flex gap-1.5 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide"
+      >
+        {daysToShow.map((day) => {
           const dayCompromissos = getCompromissosForDay(day);
           const isSelected = isSameDay(day, selectedDate);
           const isTodayDate = isToday(day);
@@ -44,6 +62,7 @@ export const AgendaWeekView = ({
           return (
             <button
               key={day.toISOString()}
+              ref={isTodayDate ? todayRef : undefined}
               onClick={() => onSelectDate(day)}
               className={cn(
                 "flex-shrink-0 flex flex-col items-center justify-center w-11 h-14 rounded-xl transition-all duration-200",
