@@ -19,8 +19,10 @@ import { LigacaoForm } from '@/components/forms/LigacaoForm';
 import { PropostaForm } from '@/components/forms/PropostaForm';
 import { CheckinForm } from '@/components/forms/CheckinForm';
 import { NotificationsSheet } from '@/components/notifications/NotificationsSheet';
-import { TabType, Notificacao } from '@/types';
+import { ImovelDetailSheet } from '@/components/imoveis/ImovelDetailSheet';
+import { TabType, Notificacao, Imovel } from '@/types';
 import { notificacoes as initialNotificacoes } from '@/data/mockData';
+import { useFavoritos } from '@/hooks/useFavoritos';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<TabType>('home');
@@ -28,6 +30,10 @@ const Index = () => {
   const [activeForm, setActiveForm] = useState<QuickActionType>(null);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notificacao[]>(initialNotificacoes);
+  
+  // Global imovel detail state
+  const [selectedImovelGlobal, setSelectedImovelGlobal] = useState<Imovel | null>(null);
+  const { isFavorito, toggleFavorito } = useFavoritos();
 
   const unreadCount = notifications.filter(n => !n.lida).length;
 
@@ -50,6 +56,16 @@ const Index = () => {
   };
   
   const handleGoHome = () => setActiveTab('home');
+
+  const handleImovelFavorite = () => {
+    if (selectedImovelGlobal) {
+      toggleFavorito(selectedImovelGlobal.id);
+      setSelectedImovelGlobal({
+        ...selectedImovelGlobal,
+        favorito: !selectedImovelGlobal.favorito
+      });
+    }
+  };
   
   const renderContent = () => {
     switch (activeTab) {
@@ -63,7 +79,12 @@ const Index = () => {
           />
         );
       case 'imoveis':
-        return <ImoveisPage onBack={handleGoHome} />;
+        return (
+          <ImoveisPage 
+            onBack={handleGoHome}
+            onSelectImovel={setSelectedImovelGlobal}
+          />
+        );
       case 'agenda':
         return <AgendaPage onBack={handleGoHome} />;
       case 'perfil':
@@ -134,6 +155,20 @@ const Index = () => {
           onMarkAllAsRead={handleMarkAllAsRead}
           onDelete={handleDeleteNotification}
         />
+
+        {/* Global Imovel Detail Sheet */}
+        {selectedImovelGlobal && (
+          <ImovelDetailSheet
+            imovel={selectedImovelGlobal}
+            isOpen={!!selectedImovelGlobal}
+            onClose={() => setSelectedImovelGlobal(null)}
+            onFavorite={handleImovelFavorite}
+            onScheduleVisit={() => {
+              setSelectedImovelGlobal(null);
+              setActiveForm('visita');
+            }}
+          />
+        )}
 
         {/* Forms */}
         <LeadForm 
