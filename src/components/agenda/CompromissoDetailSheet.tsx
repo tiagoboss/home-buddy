@@ -155,7 +155,7 @@ export const CompromissoDetailSheet = ({
       <div 
         className={cn(
           "absolute bottom-0 left-0 right-0 z-50 bg-card rounded-t-3xl",
-          "h-[calc(100%-40px)] flex flex-col touch-none",
+          "max-h-[90%] flex flex-col touch-none",
           !isClosing && dragOffset === 0 && "animate-slide-up-sheet",
           isClosing && "transition-transform duration-200 ease-out"
         )}
