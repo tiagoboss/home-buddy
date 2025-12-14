@@ -83,15 +83,15 @@ export const AgendaWeekView = ({
                       e.stopPropagation();
                       onSelectCompromisso(compromisso);
                     }}
-                    className="w-full flex items-center gap-1.5 p-1.5 rounded-lg bg-card/60 hover:bg-card transition-colors text-left"
+                    className="w-full flex items-stretch rounded-xl bg-card/80 hover:bg-card transition-colors text-left overflow-hidden"
                   >
-                    {/* Color indicator */}
+                    {/* Color indicator - full height bar */}
                     <div className={cn(
-                      "w-1 h-6 rounded-full flex-shrink-0",
+                      "w-[3px] flex-shrink-0",
                       tipoColors[compromisso.tipo] || 'bg-muted'
                     )} />
                     
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 py-1.5 px-2">
                       <p className="text-[11px] font-bold text-foreground">
                         {compromisso.hora}
                       </p>
