@@ -136,10 +136,18 @@ export const useCompromissos = () => {
         .order('hora', { ascending: true });
 
       if (error) throw error;
-      setCompromissos(data as Compromisso[]);
+      
+      // Fallback to mock data if database is empty
+      if (!data || data.length === 0) {
+        setCompromissos(getMockCompromissos());
+      } else {
+        setCompromissos(data as Compromisso[]);
+      }
     } catch (err: any) {
       console.error('Error fetching compromissos:', err);
       setError(err.message);
+      // Use mock data on error as well
+      setCompromissos(getMockCompromissos());
     } finally {
       setLoading(false);
     }
