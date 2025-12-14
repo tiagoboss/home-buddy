@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { leads as mockLeadsData } from '@/data/mockData';
 
 export interface Lead {
   id: string;
@@ -18,11 +19,32 @@ export interface Lead {
   updated_at: string;
 }
 
+// Convert mock data to Lead format
+const convertMockLeads = (): Lead[] => {
+  return mockLeadsData.map(lead => ({
+    id: lead.id,
+    user_id: '',
+    nome: lead.nome,
+    telefone: lead.telefone,
+    email: lead.email || null,
+    status: lead.status as Lead['status'],
+    interesse: lead.interesse,
+    faixa_preco: null,
+    bairros: null,
+    ultimo_contato: lead.ultimoContato,
+    avatar: lead.avatar,
+    created_at: lead.ultimoContato,
+    updated_at: lead.ultimoContato,
+  }));
+};
+
 export const useLeads = () => {
   const { user } = useAuth();
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Initialize with mock data immediately
+  const [leads, setLeads] = useState<Lead[]>(convertMockLeads());
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isUsingMockData, setIsUsingMockData] = useState(true);
 
   const fetchLeads = async () => {
     try {
@@ -40,10 +62,16 @@ export const useLeads = () => {
       const { data, error } = await query;
 
       if (error) throw error;
-      setLeads(data as Lead[]);
+      
+      // Only use DB data if we have results, otherwise keep mock data
+      if (data && data.length > 0) {
+        setLeads(data as Lead[]);
+        setIsUsingMockData(false);
+      }
     } catch (err: any) {
       console.error('Error fetching leads:', err);
       setError(err.message);
+      // Keep mock data on error
     } finally {
       setLoading(false);
     }
@@ -64,6 +92,7 @@ export const useLeads = () => {
 
     if (!error && data) {
       setLeads((prev) => [data as Lead, ...prev]);
+      setIsUsingMockData(false);
     }
 
     return { data, error };
@@ -85,6 +114,12 @@ export const useLeads = () => {
   };
 
   const deleteLead = async (id: string) => {
+    // For mock data, just remove from state
+    if (isUsingMockData) {
+      setLeads((prev) => prev.filter((lead) => lead.id !== id));
+      return { error: null };
+    }
+
     const { error } = await supabase.from('leads').delete().eq('id', id);
 
     if (!error) {
@@ -94,5 +129,5 @@ export const useLeads = () => {
     return { error };
   };
 
-  return { leads, loading, error, fetchLeads, createLead, updateLead, deleteLead };
+  return { leads, loading, error, isUsingMockData, fetchLeads, createLead, updateLead, deleteLead };
 };
