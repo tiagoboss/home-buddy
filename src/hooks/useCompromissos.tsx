@@ -33,6 +33,10 @@ const getMockCompromissos = (): Compromisso[] => {
     return date.toISOString().split('T')[0];
   };
 
+  // Dias passados (para preencher a semana toda)
+  const dayMinus3 = getDateString(-3);
+  const dayMinus2 = getDateString(-2);
+  const dayMinus1 = getDateString(-1);
   const today = getDateString(0);
   const tomorrow = getDateString(1);
   const day2 = getDateString(2);
@@ -42,6 +46,114 @@ const getMockCompromissos = (): Compromisso[] => {
   const day6 = getDateString(6);
   
   return [
+    // 3 dias atrás - 2 compromissos (realizados)
+    {
+      id: 'mock-past-1',
+      user_id: 'demo',
+      tipo: 'visita',
+      data: dayMinus3,
+      hora: '10:00',
+      cliente: 'Lucas Ferreira',
+      imovel: 'Apartamento 2 quartos - Pinheiros',
+      endereco: 'Rua dos Pinheiros, 500 - Pinheiros, SP',
+      status: 'realizado',
+      lead_id: 'mock-lead-past-1',
+      lead: { id: 'mock-lead-past-1', nome: 'Lucas Ferreira', telefone: '11944441111', email: 'lucas@email.com' },
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: 'mock-past-2',
+      user_id: 'demo',
+      tipo: 'ligacao',
+      data: dayMinus3,
+      hora: '15:00',
+      cliente: 'Juliana Martins',
+      imovel: null,
+      endereco: null,
+      status: 'realizado',
+      lead_id: 'mock-lead-past-2',
+      lead: { id: 'mock-lead-past-2', nome: 'Juliana Martins', telefone: '11933332222', email: 'juliana@email.com' },
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    // 2 dias atrás - 3 compromissos
+    {
+      id: 'mock-past-3',
+      user_id: 'demo',
+      tipo: 'visita',
+      data: dayMinus2,
+      hora: '09:30',
+      cliente: 'Pedro Almeida',
+      imovel: 'Casa térrea - Brooklin',
+      endereco: 'Rua Flórida, 200 - Brooklin, SP',
+      status: 'realizado',
+      lead_id: 'mock-lead-past-3',
+      lead: { id: 'mock-lead-past-3', nome: 'Pedro Almeida', telefone: '11922223333', email: 'pedro@email.com' },
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: 'mock-past-4',
+      user_id: 'demo',
+      tipo: 'reuniao',
+      data: dayMinus2,
+      hora: '14:00',
+      cliente: 'Camila Rocha',
+      imovel: 'Loft - Itaim',
+      endereco: 'Rua Joaquim Floriano, 800 - Itaim, SP',
+      status: 'cancelado',
+      lead_id: 'mock-lead-past-4',
+      lead: { id: 'mock-lead-past-4', nome: 'Camila Rocha', telefone: '11911114444', email: 'camila@email.com' },
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: 'mock-past-5',
+      user_id: 'demo',
+      tipo: 'ligacao',
+      data: dayMinus2,
+      hora: '17:00',
+      cliente: 'Rafael Silva',
+      imovel: null,
+      endereco: null,
+      status: 'realizado',
+      lead_id: 'mock-lead-past-5',
+      lead: { id: 'mock-lead-past-5', nome: 'Rafael Silva', telefone: '11900005555', email: 'rafael@email.com' },
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    // Ontem - 2 compromissos
+    {
+      id: 'mock-past-6',
+      user_id: 'demo',
+      tipo: 'visita',
+      data: dayMinus1,
+      hora: '11:00',
+      cliente: 'Beatriz Nunes',
+      imovel: 'Apartamento Garden - Vila Olímpia',
+      endereco: 'Rua Funchal, 400 - Vila Olímpia, SP',
+      status: 'realizado',
+      lead_id: 'mock-lead-past-6',
+      lead: { id: 'mock-lead-past-6', nome: 'Beatriz Nunes', telefone: '11988886666', email: 'beatriz@email.com' },
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: 'mock-past-7',
+      user_id: 'demo',
+      tipo: 'reuniao',
+      data: dayMinus1,
+      hora: '16:00',
+      cliente: 'Thiago Costa',
+      imovel: 'Penthouse - Perdizes',
+      endereco: 'Rua Cardoso de Almeida, 1500 - Perdizes, SP',
+      status: 'realizado',
+      lead_id: 'mock-lead-past-7',
+      lead: { id: 'mock-lead-past-7', nome: 'Thiago Costa', telefone: '11977777777', email: 'thiago@email.com' },
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
     // Hoje - 4 compromissos
     {
       id: 'mock-1',
