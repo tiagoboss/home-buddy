@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { X, MapPin, Bed, Bath, Car, Ruler, Building2, Heart, MessageCircle, Calendar, Navigation, Share2, Pencil, Send } from 'lucide-react';
+import { X, MapPin, Bed, Bath, Car, Ruler, Building2, Heart, Calendar, Navigation, Share2, Pencil, Send, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Imovel } from '@/types';
 import { ImovelModalidadeBadge } from './ImovelModalidadeBadge';
 import { cn } from '@/lib/utils';
@@ -26,8 +26,21 @@ const formatCurrency = (value: number) => {
 export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite, onScheduleVisit, onEdit }: ImovelDetailSheetProps) => {
   const [translateY, setTranslateY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const startY = useRef(0);
   const DRAG_THRESHOLD = 100;
+
+  // Combine foto principal with fotos array
+  const allPhotos = (() => {
+    const photos: string[] = [];
+    if (imovel.foto) photos.push(imovel.foto);
+    if (imovel.fotos && imovel.fotos.length > 0) {
+      imovel.fotos.forEach(f => {
+        if (f && !photos.includes(f)) photos.push(f);
+      });
+    }
+    return photos.length > 0 ? photos : ['/placeholder.svg'];
+  })();
 
   const handleTouchStart = (e: React.TouchEvent) => {
     startY.current = e.touches[0].clientY;
@@ -51,14 +64,15 @@ export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite, onSched
     setTranslateY(0);
   };
 
-  const getPhoneNumber = () => {
-    const phone = imovel.telefoneContato;
-    if (!phone) return null;
-    return phone.replace(/\D/g, '');
+  const handlePrevPhoto = () => {
+    setCurrentPhotoIndex((prev) => (prev === 0 ? allPhotos.length - 1 : prev - 1));
+  };
+
+  const handleNextPhoto = () => {
+    setCurrentPhotoIndex((prev) => (prev === allPhotos.length - 1 ? 0 : prev + 1));
   };
 
   const handleSendToClient = () => {
-    // Opens WhatsApp to send property info to a client (no pre-filled number)
     const message = `🏠 *${imovel.titulo}*\n\n📍 ${imovel.bairro}, ${imovel.cidade}\n💰 ${formatCurrency(imovel.preco)}${imovel.modalidade === 'locacao' ? '/mês' : imovel.modalidade === 'temporada' ? '/diária' : ''}\n\n🛏️ ${imovel.quartos} quartos | 🚿 ${imovel.banheiros} banheiros | 🚗 ${imovel.vagas} vagas | 📐 ${imovel.area}m²${imovel.descricao ? `\n\n${imovel.descricao}` : ''}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
   };
@@ -79,7 +93,6 @@ export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite, onSched
           url: window.location.href,
         });
       } catch (err) {
-        // User cancelled or error - fallback to clipboard
         if ((err as Error).name !== 'AbortError') {
           await copyToClipboard(shareText);
         }
@@ -141,8 +154,6 @@ export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite, onSched
 
   if (!isOpen) return null;
 
-  const hasPhone = !!getPhoneNumber();
-
   return (
     <div className="absolute inset-0 z-50 flex flex-col">
       {/* Overlay */}
@@ -172,19 +183,48 @@ export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite, onSched
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto pb-6">
-          {/* Image */}
+          {/* Image Carousel */}
           <div className="relative h-56 bg-muted">
             <img
-              src={imovel.foto || '/placeholder.svg'}
-              alt={imovel.titulo}
-              className="w-full h-full object-cover"
+              src={allPhotos[currentPhotoIndex]}
+              alt={`${imovel.titulo} - Foto ${currentPhotoIndex + 1}`}
+              className="w-full h-full object-cover transition-opacity duration-300"
             />
+            
+            {/* Navigation Arrows */}
+            {allPhotos.length > 1 && (
+              <>
+                <button
+                  onClick={handlePrevPhoto}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-background/80 backdrop-blur-sm rounded-full"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={handleNextPhoto}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-background/80 backdrop-blur-sm rounded-full"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </>
+            )}
+
+            {/* Photo Counter */}
+            {allPhotos.length > 1 && (
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 px-3 py-1 bg-background/80 backdrop-blur-sm rounded-full text-sm font-medium">
+                {currentPhotoIndex + 1} / {allPhotos.length}
+              </div>
+            )}
+
+            {/* Close Button */}
             <button
               onClick={onClose}
               className="absolute top-4 left-4 p-2 bg-background/80 backdrop-blur-sm rounded-full"
             >
               <X className="w-5 h-5" />
             </button>
+
+            {/* Action Buttons */}
             <div className="absolute top-4 right-4 flex gap-2">
               {onEdit && (
                 <button
@@ -212,6 +252,8 @@ export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite, onSched
                 />
               </button>
             </div>
+
+            {/* Badges */}
             <div className="absolute bottom-4 left-4 flex gap-2">
               <ImovelModalidadeBadge modalidade={imovel.modalidade} />
               {imovel.novo && (
@@ -225,6 +267,24 @@ export const ImovelDetailSheet = ({ imovel, isOpen, onClose, onFavorite, onSched
                 </span>
               )}
             </div>
+
+            {/* Dot Indicators */}
+            {allPhotos.length > 1 && (
+              <div className="absolute bottom-4 right-4 flex gap-1.5">
+                {allPhotos.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentPhotoIndex(index)}
+                    className={cn(
+                      'w-2 h-2 rounded-full transition-all',
+                      index === currentPhotoIndex
+                        ? 'bg-white w-4'
+                        : 'bg-white/50'
+                    )}
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="px-4 pt-4 space-y-4">
