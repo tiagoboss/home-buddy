@@ -172,7 +172,7 @@ export const ImoveisPage = ({ onSelectImovel }: ImoveisPageProps) => {
 
 
   return (
-    <div className="px-4 pt-4 pb-4 transition-all duration-300 ease-out animate-fade-in relative">
+    <div className="px-4 pt-4 pb-4 animate-slide-up-fade relative">
       {/* Header */}
       <div className="mb-4">
         <PageHeader title="Imóveis" />

@@ -110,7 +110,7 @@ export const LeadsPage = ({ onScheduleVisit, onSelectLead }: LeadsPageProps) => 
       </header>
       
       {/* Leads List */}
-      <main className="px-4 py-4 transition-all duration-300 ease-out animate-fade-in">
+      <main className="px-4 py-4 animate-slide-up-fade">
         <div className="space-y-2">
           {filteredLeads.map((lead) => (
             <SwipeableLeadCard

@@ -157,7 +157,7 @@ export const PropostasPage = () => {
       </header>
       
       {/* Propostas List */}
-      <main className="px-4 py-4 transition-all duration-300 ease-out animate-fade-in">
+      <main className="px-4 py-4 animate-slide-up-fade">
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
