@@ -159,6 +159,10 @@
     animation: pulse-badge 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 
+  .animate-tab-transition {
+    animation: tab-slide-in 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+
   .shadow-card {
     box-shadow: var(--shadow-card);
   }
@@ -205,6 +209,17 @@
   50% {
     transform: scale(1.1);
     opacity: 0.8;
+  }
+}
+
+@keyframes tab-slide-in {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
