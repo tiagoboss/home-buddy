@@ -20,10 +20,11 @@ import { PropostaForm } from '@/components/forms/PropostaForm';
 import { CheckinForm } from '@/components/forms/CheckinForm';
 import { NotificationsSheet } from '@/components/notifications/NotificationsSheet';
 import { ImovelDetailSheet } from '@/components/imoveis/ImovelDetailSheet';
+import { LeadDetailSheet } from '@/components/leads/LeadDetailSheet';
 import { TabType, Notificacao, Imovel } from '@/types';
+import { Lead } from '@/hooks/useLeads';
 import { notificacoes as initialNotificacoes } from '@/data/mockData';
 import { useFavoritos } from '@/hooks/useFavoritos';
-
 const Index = () => {
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
@@ -31,8 +32,9 @@ const Index = () => {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notificacao[]>(initialNotificacoes);
   
-  // Global imovel detail state
+  // Global detail states
   const [selectedImovelGlobal, setSelectedImovelGlobal] = useState<Imovel | null>(null);
+  const [selectedLeadGlobal, setSelectedLeadGlobal] = useState<Lead | null>(null);
   const { isFavorito, toggleFavorito } = useFavoritos();
 
   const unreadCount = notifications.filter(n => !n.lida).length;
@@ -76,6 +78,7 @@ const Index = () => {
           <LeadsPage 
             onScheduleVisit={() => setActiveForm('visita')}
             onBack={handleGoHome}
+            onSelectLead={setSelectedLeadGlobal}
           />
         );
       case 'imoveis':
@@ -165,6 +168,19 @@ const Index = () => {
             onFavorite={handleImovelFavorite}
             onScheduleVisit={() => {
               setSelectedImovelGlobal(null);
+              setActiveForm('visita');
+            }}
+          />
+        )}
+
+        {/* Global Lead Detail Sheet */}
+        {selectedLeadGlobal && (
+          <LeadDetailSheet
+            lead={selectedLeadGlobal}
+            isOpen={!!selectedLeadGlobal}
+            onClose={() => setSelectedLeadGlobal(null)}
+            onScheduleVisit={() => {
+              setSelectedLeadGlobal(null);
               setActiveForm('visita');
             }}
           />
