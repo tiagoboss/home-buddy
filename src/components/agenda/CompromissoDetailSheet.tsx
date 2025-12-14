@@ -1,4 +1,5 @@
 import { Compromisso } from '@/hooks/useCompromissos';
+import { useHaptic } from '@/hooks/useHaptic';
 import { Home, Phone, Users, MapPin, MessageCircle, X, Check, Calendar, Navigation, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -45,6 +46,27 @@ export const CompromissoDetailSheet = ({
   const dragStartY = useRef(0);
   const dragStartTime = useRef(0);
   const isDragging = useRef(false);
+  const haptic = useHaptic();
+
+  const handleConfirmWithHaptic = useCallback(() => {
+    haptic.success();
+    onConfirm?.();
+  }, [haptic, onConfirm]);
+
+  const handleCancelWithHaptic = useCallback(() => {
+    haptic.error();
+    onCancel?.();
+  }, [haptic, onCancel]);
+
+  const handleCompleteWithHaptic = useCallback(() => {
+    haptic.success();
+    onComplete?.();
+  }, [haptic, onComplete]);
+
+  const handleRescheduleWithHaptic = useCallback(() => {
+    haptic.medium();
+    onReschedule?.();
+  }, [haptic, onReschedule]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     dragStartY.current = e.touches[0].clientY;
@@ -242,8 +264,8 @@ export const CompromissoDetailSheet = ({
           {/* Reschedule Button */}
           {canReschedule && onReschedule && (
             <button 
-              onClick={onReschedule}
-              className="w-full flex items-center justify-center gap-2 p-4 bg-secondary text-foreground rounded-xl animate-scale-press mb-4"
+              onClick={handleRescheduleWithHaptic}
+              className="w-full flex items-center justify-center gap-2 p-4 bg-secondary text-foreground rounded-xl animate-scale-press mb-4 active:scale-95 transition-transform"
             >
               <Clock className="w-5 h-5" />
               <span className="font-semibold">Reagendar</span>
@@ -255,8 +277,8 @@ export const CompromissoDetailSheet = ({
             <div className="space-y-3">
               {compromisso.status === 'pendente' && onConfirm && (
                 <button 
-                  onClick={onConfirm}
-                  className="w-full flex items-center justify-center gap-2 p-4 bg-success text-white rounded-xl animate-scale-press"
+                  onClick={handleConfirmWithHaptic}
+                  className="w-full flex items-center justify-center gap-2 p-4 bg-success text-white rounded-xl animate-scale-press active:scale-95 transition-transform"
                 >
                   <Check className="w-5 h-5" />
                   <span className="font-semibold">Confirmar Compromisso</span>
@@ -265,8 +287,8 @@ export const CompromissoDetailSheet = ({
               
               {compromisso.status === 'confirmado' && onComplete && (
                 <button 
-                  onClick={onComplete}
-                  className="w-full flex items-center justify-center gap-2 p-4 bg-success text-white rounded-xl animate-scale-press"
+                  onClick={handleCompleteWithHaptic}
+                  className="w-full flex items-center justify-center gap-2 p-4 bg-success text-white rounded-xl animate-scale-press active:scale-95 transition-transform"
                 >
                   <Check className="w-5 h-5" />
                   <span className="font-semibold">Marcar como Realizado</span>
@@ -275,8 +297,8 @@ export const CompromissoDetailSheet = ({
 
               {onCancel && (
                 <button 
-                  onClick={onCancel}
-                  className="w-full flex items-center justify-center gap-2 p-4 bg-destructive/10 text-destructive rounded-xl animate-scale-press"
+                  onClick={handleCancelWithHaptic}
+                  className="w-full flex items-center justify-center gap-2 p-4 bg-destructive/10 text-destructive rounded-xl animate-scale-press active:scale-95 transition-transform"
                 >
                   <X className="w-5 h-5" />
                   <span className="font-semibold">Cancelar Compromisso</span>
