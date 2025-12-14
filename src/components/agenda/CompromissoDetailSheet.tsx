@@ -147,7 +147,7 @@ export const CompromissoDetailSheet = ({
       {/* Overlay - cobre toda a tela */}
       <div 
         className="absolute inset-0 bg-black z-50 animate-fade-in transition-opacity duration-200"
-        style={{ opacity: overlayOpacity }}
+        style={{ opacity: overlayOpacity, touchAction: 'none' }}
         onClick={onClose}
       />
       
@@ -155,7 +155,7 @@ export const CompromissoDetailSheet = ({
       <div 
         className={cn(
           "absolute bottom-0 left-0 right-0 z-50 bg-card rounded-t-3xl",
-          "touch-none max-h-[85%] overflow-hidden",
+          "touch-none",
           !isClosing && dragOffset === 0 && "animate-slide-up-sheet",
           isClosing && "transition-transform duration-200 ease-out"
         )}
@@ -163,7 +163,8 @@ export const CompromissoDetailSheet = ({
           transform: isClosing 
             ? 'translateY(100%)' 
             : `translateY(${dragOffset}px)`,
-          transition: dragOffset === 0 && !isClosing ? 'transform 0.2s ease-out' : undefined
+          transition: dragOffset === 0 && !isClosing ? 'transform 0.2s ease-out' : undefined,
+          overscrollBehavior: 'contain'
         }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -178,7 +179,7 @@ export const CompromissoDetailSheet = ({
         </div>
 
         {/* Content */}
-        <div className="px-4 pb-4">
+        <div className="px-4 pb-[88px]">
           {/* Header */}
           <div className="flex items-center gap-4 mb-6">
             <div className={cn(
