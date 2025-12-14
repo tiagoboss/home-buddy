@@ -22,11 +22,13 @@ import { NotificationsSheet } from '@/components/notifications/NotificationsShee
 import { ImovelDetailSheet } from '@/components/imoveis/ImovelDetailSheet';
 import { LeadDetailSheet } from '@/components/leads/LeadDetailSheet';
 import { CompromissoDetailSheet } from '@/components/agenda/CompromissoDetailSheet';
+import { RescheduleSheet } from '@/components/agenda/RescheduleSheet';
 import { TabType, Notificacao, Imovel, Compromisso as MockCompromisso, Lead as MockLead } from '@/types';
 import { Lead } from '@/hooks/useLeads';
-import { Compromisso as HookCompromisso } from '@/hooks/useCompromissos';
+import { Compromisso as HookCompromisso, useCompromissos } from '@/hooks/useCompromissos';
 import { notificacoes as initialNotificacoes } from '@/data/mockData';
 import { useFavoritos } from '@/hooks/useFavoritos';
+import { toast } from 'sonner';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<TabType>('home');
@@ -39,7 +41,9 @@ const Index = () => {
   const [selectedImovelGlobal, setSelectedImovelGlobal] = useState<Imovel | null>(null);
   const [selectedLeadGlobal, setSelectedLeadGlobal] = useState<Lead | null>(null);
   const [selectedCompromissoGlobal, setSelectedCompromissoGlobal] = useState<HookCompromisso | null>(null);
+  const [isRescheduleOpen, setIsRescheduleOpen] = useState(false);
   const { isFavorito, toggleFavorito } = useFavoritos();
+  const { updateCompromisso } = useCompromissos();
 
   // Convert mock compromisso to hook format for global sheet
   const convertMockCompromisso = (c: MockCompromisso): HookCompromisso => ({
@@ -104,6 +108,53 @@ const Index = () => {
         ...selectedImovelGlobal,
         favorito: !selectedImovelGlobal.favorito
       });
+    }
+  };
+
+  const handleCloseCompromisso = () => {
+    setSelectedCompromissoGlobal(null);
+  };
+
+  const handleConfirmCompromisso = async () => {
+    if (!selectedCompromissoGlobal) return;
+    const { error } = await updateCompromisso(selectedCompromissoGlobal.id, { status: 'confirmado' });
+    if (error) {
+      toast.error('Erro ao confirmar compromisso');
+    } else {
+      toast.success('Compromisso confirmado!');
+      handleCloseCompromisso();
+    }
+  };
+
+  const handleCancelCompromisso = async () => {
+    if (!selectedCompromissoGlobal) return;
+    const { error } = await updateCompromisso(selectedCompromissoGlobal.id, { status: 'cancelado' });
+    if (error) {
+      toast.error('Erro ao cancelar compromisso');
+    } else {
+      toast.success('Compromisso cancelado');
+      handleCloseCompromisso();
+    }
+  };
+
+  const handleCompleteCompromisso = async () => {
+    if (!selectedCompromissoGlobal) return;
+    const { error } = await updateCompromisso(selectedCompromissoGlobal.id, { status: 'realizado' });
+    if (error) {
+      toast.error('Erro ao marcar como realizado');
+    } else {
+      toast.success('Compromisso realizado!');
+      handleCloseCompromisso();
+    }
+  };
+
+  const handleRescheduleCompromisso = async (id: string, newDate: string, newTime: string) => {
+    const { error } = await updateCompromisso(id, { data: newDate, hora: newTime });
+    if (error) {
+      toast.error('Erro ao reagendar compromisso');
+    } else {
+      toast.success('Compromisso reagendado!');
+      handleCloseCompromisso();
     }
   };
   
@@ -234,9 +285,21 @@ const Index = () => {
           <CompromissoDetailSheet
             compromisso={selectedCompromissoGlobal}
             isOpen={!!selectedCompromissoGlobal}
-            onClose={() => setSelectedCompromissoGlobal(null)}
+            onClose={handleCloseCompromisso}
+            onConfirm={handleConfirmCompromisso}
+            onCancel={handleCancelCompromisso}
+            onComplete={handleCompleteCompromisso}
+            onReschedule={() => setIsRescheduleOpen(true)}
           />
         )}
+
+        {/* Reschedule Sheet */}
+        <RescheduleSheet
+          compromisso={selectedCompromissoGlobal}
+          isOpen={isRescheduleOpen}
+          onClose={() => setIsRescheduleOpen(false)}
+          onReschedule={handleRescheduleCompromisso}
+        />
 
         {/* Forms */}
         <LeadForm 
