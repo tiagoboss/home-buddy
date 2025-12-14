@@ -11,11 +11,10 @@ import { Imovel as ImovelType } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 
 interface ImoveisPageProps {
-  onBack?: () => void;
   onSelectImovel?: (imovel: ImovelType) => void;
 }
 
-export const ImoveisPage = ({ onBack, onSelectImovel }: ImoveisPageProps) => {
+export const ImoveisPage = ({ onSelectImovel }: ImoveisPageProps) => {
   const { user } = useAuth();
   const { imoveis: dbImoveis, updateImovel, isUsingMockData } = useImoveis();
   const { isFavorito, toggleFavorito } = useFavoritos();
@@ -176,7 +175,7 @@ export const ImoveisPage = ({ onBack, onSelectImovel }: ImoveisPageProps) => {
     <div className="px-4 pt-4 pb-4 animate-fade-in relative">
       {/* Header */}
       <div className="mb-4">
-        <PageHeader title="Imóveis" onBack={onBack} />
+        <PageHeader title="Imóveis" />
         <p className="text-sm text-muted-foreground">{allImoveis.length} imóveis cadastrados</p>
       </div>
 

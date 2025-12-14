@@ -16,11 +16,7 @@ import { toast } from 'sonner';
 const views = ['Semana', 'Mês'];
 const SWIPE_THRESHOLD = 50;
 
-interface AgendaPageProps {
-  onBack?: () => void;
-}
-
-export const AgendaPage = ({ onBack }: AgendaPageProps) => {
+export const AgendaPage = () => {
   const [activeView, setActiveView] = useState('Semana');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedCompromisso, setSelectedCompromisso] = useState<Compromisso | null>(null);
@@ -138,7 +134,7 @@ export const AgendaPage = ({ onBack }: AgendaPageProps) => {
       {/* Header - Simplified */}
       <header className="sticky top-0 z-40 glassmorphism px-4 py-3">
         <div className="flex items-center justify-between mb-3">
-          <PageHeader title="Agenda" onBack={onBack} />
+          <PageHeader title="Agenda" />
           
           {/* Today Button */}
           {!isTodaySelected && (

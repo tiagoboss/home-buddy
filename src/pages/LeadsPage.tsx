@@ -19,11 +19,10 @@ const filters = [
 
 interface LeadsPageProps {
   onScheduleVisit?: (lead: Lead) => void;
-  onBack?: () => void;
   onSelectLead?: (lead: Lead) => void;
 }
 
-export const LeadsPage = ({ onScheduleVisit, onBack, onSelectLead }: LeadsPageProps) => {
+export const LeadsPage = ({ onScheduleVisit, onSelectLead }: LeadsPageProps) => {
   const { leads, fetchLeads, deleteLead } = useLeads();
   const [activeFilter, setActiveFilter] = useState('todos');
   const [searchQuery, setSearchQuery] = useState('');
@@ -53,7 +52,6 @@ export const LeadsPage = ({ onScheduleVisit, onBack, onSelectLead }: LeadsPagePr
       <header className="sticky top-0 z-40 glassmorphism px-4 py-3">
         <PageHeader
           title="Meus Leads"
-          onBack={onBack}
           rightContent={
             <Button
               variant="ghost"
