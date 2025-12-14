@@ -52,7 +52,7 @@ export const AgendaWeekView = ({
       {/* Compact Day Selector */}
       <div 
         ref={scrollContainerRef}
-        className="flex gap-1.5 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide"
+        className="flex gap-1.5 overflow-x-auto pb-2 -mx-4 px-4 hide-scrollbar"
       >
         {daysToShow.map((day) => {
           const dayCompromissos = getCompromissosForDay(day);
