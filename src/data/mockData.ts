@@ -71,11 +71,18 @@ export const leads: Lead[] = [
   },
 ];
 
+// Helper to generate dynamic dates
+const getDateString = (daysOffset: number): string => {
+  const date = new Date();
+  date.setDate(date.getDate() + daysOffset);
+  return date.toISOString().split('T')[0];
+};
+
 export const compromissos: Compromisso[] = [
   {
     id: "1",
     tipo: "visita",
-    data: "2024-01-15",
+    data: getDateString(0), // Today
     hora: "09:00",
     cliente: "Maria Santos",
     imovel: "Apt 3q Jardins",
@@ -85,7 +92,7 @@ export const compromissos: Compromisso[] = [
   {
     id: "2",
     tipo: "ligacao",
-    data: "2024-01-15",
+    data: getDateString(0), // Today
     hora: "11:30",
     cliente: "Carlos Oliveira",
     imovel: "Proposta pendente",
@@ -94,17 +101,17 @@ export const compromissos: Compromisso[] = [
   {
     id: "3",
     tipo: "visita",
-    data: "2024-01-15",
+    data: getDateString(0), // Today
     hora: "14:00",
     cliente: "Ana Paula Costa",
     imovel: "Studio Vila Madalena",
     endereco: "Rua Harmonia, 456 - Vila Madalena",
-    status: "confirmado",
+    status: "pendente",
   },
   {
     id: "4",
     tipo: "reuniao",
-    data: "2024-01-15",
+    data: getDateString(0), // Today
     hora: "16:30",
     cliente: "Roberto Mendes",
     imovel: "Discussão de contrato",
@@ -113,11 +120,39 @@ export const compromissos: Compromisso[] = [
   {
     id: "5",
     tipo: "visita",
-    data: "2024-01-16",
+    data: getDateString(1), // Tomorrow
     hora: "10:00",
     cliente: "Fernanda Lima",
     imovel: "Cobertura Jardins",
     endereco: "Al. Lorena, 789 - Jardins",
+    status: "confirmado",
+  },
+  {
+    id: "6",
+    tipo: "ligacao",
+    data: getDateString(1), // Tomorrow
+    hora: "15:00",
+    cliente: "Pedro Almeida",
+    imovel: "Follow-up proposta",
+    status: "pendente",
+  },
+  {
+    id: "7",
+    tipo: "visita",
+    data: getDateString(2), // Day after tomorrow
+    hora: "11:00",
+    cliente: "Juliana Ferreira",
+    imovel: "Casa Morumbi",
+    endereco: "Rua das Palmeiras, 200 - Morumbi",
+    status: "pendente",
+  },
+  {
+    id: "8",
+    tipo: "reuniao",
+    data: getDateString(3),
+    hora: "14:00",
+    cliente: "Ricardo Souza",
+    imovel: "Fechamento contrato",
     status: "confirmado",
   },
 ];

@@ -131,15 +131,24 @@ export const SwipeableImovelCard = ({
 
   return (
     <div className="relative overflow-hidden rounded-2xl">
-      {/* Swipe Actions Background */}
-      <div className="absolute inset-0 flex">
-        <div className="flex-1 bg-emerald-500 flex items-center justify-start pl-4">
+      {/* Swipe Actions Background - Only visible when swiping */}
+      <div className={cn(
+        "absolute inset-0 flex transition-opacity duration-150 rounded-2xl overflow-hidden",
+        translateX === 0 ? "opacity-0 pointer-events-none" : "opacity-100"
+      )}>
+        <div className={cn(
+          "flex-1 bg-emerald-500 flex items-center justify-start pl-4 transition-opacity duration-200",
+          translateX > 0 ? "opacity-100" : "opacity-0"
+        )}>
           <div className="flex flex-col items-center text-white">
             <Calendar className="w-6 h-6" />
             <span className="text-xs mt-1">Agendar</span>
           </div>
         </div>
-        <div className="flex-1 bg-green-500 flex items-center justify-end pr-4">
+        <div className={cn(
+          "flex-1 bg-green-500 flex items-center justify-end pr-4 transition-opacity duration-200",
+          translateX < 0 ? "opacity-100" : "opacity-0"
+        )}>
           <div className="flex flex-col items-center text-white">
             <Send className="w-6 h-6" />
             <span className="text-xs mt-1">Enviar</span>

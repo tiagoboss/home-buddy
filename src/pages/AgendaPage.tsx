@@ -192,7 +192,7 @@ export const AgendaPage = ({ onBack }: AgendaPageProps) => {
               key={view}
               onClick={() => setActiveView(view)}
               className={cn(
-                "flex-1 py-2 text-sm font-medium rounded-lg transition-all duration-200",
+                "flex-1 py-2 text-sm font-medium rounded-lg transition-all duration-300",
                 activeView === view
                   ? "bg-card text-foreground shadow-sm"
                   : "text-muted-foreground"
@@ -210,8 +210,13 @@ export const AgendaPage = ({ onBack }: AgendaPageProps) => {
           <div className="flex items-center justify-center py-16">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
-        ) : activeView === 'Semana' ? (
-          <AgendaWeekView
+        ) : (
+          <div className={cn(
+            "transition-all duration-300 ease-out",
+            activeView === 'Semana' ? "animate-fade-in" : "animate-fade-in"
+          )}>
+            {activeView === 'Semana' ? (
+              <AgendaWeekView
             compromissos={compromissos}
             selectedDate={selectedDate}
             onSelectDate={setSelectedDate}
@@ -219,37 +224,39 @@ export const AgendaPage = ({ onBack }: AgendaPageProps) => {
             onConfirm={handleConfirm}
             onCancel={handleCancel}
           />
-        ) : (
-          <>
-            <AgendaMonthView
-              compromissos={compromissos}
-              selectedDate={selectedDate}
-              onSelectDate={setSelectedDate}
-            />
-            {/* Show day's compromissos below calendar */}
-            <div className="mt-4">
-              <h3 className="text-sm font-medium text-muted-foreground mb-3">
-                {format(selectedDate, "d 'de' MMMM", { locale: ptBR })} - {filteredCompromissos.length} {filteredCompromissos.length === 1 ? 'compromisso' : 'compromissos'}
-              </h3>
-              {filteredCompromissos.length === 0 ? (
-                <div className="bg-secondary rounded-xl p-4 text-center">
-                  <p className="text-sm text-muted-foreground">Nenhum compromisso neste dia</p>
+            ) : (
+              <>
+                <AgendaMonthView
+                  compromissos={compromissos}
+                  selectedDate={selectedDate}
+                  onSelectDate={setSelectedDate}
+                />
+                {/* Show day's compromissos below calendar */}
+                <div className="mt-4">
+                  <h3 className="text-sm font-medium text-muted-foreground mb-3">
+                    {format(selectedDate, "d 'de' MMMM", { locale: ptBR })} - {filteredCompromissos.length} {filteredCompromissos.length === 1 ? 'compromisso' : 'compromissos'}
+                  </h3>
+                  {filteredCompromissos.length === 0 ? (
+                    <div className="bg-secondary rounded-xl p-4 text-center">
+                      <p className="text-sm text-muted-foreground">Nenhum compromisso neste dia</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {filteredCompromissos.map((compromisso) => (
+                        <SwipeableCompromissoCard
+                          key={compromisso.id}
+                          compromisso={compromisso}
+                          onClick={() => handleCardClick(compromisso)}
+                          onConfirm={() => handleConfirm(compromisso)}
+                          onCancel={() => handleCancel(compromisso)}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="space-y-2">
-                  {filteredCompromissos.map((compromisso) => (
-                    <SwipeableCompromissoCard
-                      key={compromisso.id}
-                      compromisso={compromisso}
-                      onClick={() => handleCardClick(compromisso)}
-                      onConfirm={() => handleConfirm(compromisso)}
-                      onCancel={() => handleCancel(compromisso)}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          </>
+              </>
+            )}
+          </div>
         )}
       </main>
 
