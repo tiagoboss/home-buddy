@@ -2,12 +2,15 @@ import { Compromisso } from '@/hooks/useCompromissos';
 import { cn } from '@/lib/utils';
 import { format, isSameDay, parseISO, startOfWeek, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { SwipeableCompromissoCard } from './SwipeableCompromissoCard';
 
 interface AgendaWeekViewProps {
   compromissos: Compromisso[];
   selectedDate: Date;
   onSelectDate: (date: Date) => void;
   onSelectCompromisso: (compromisso: Compromisso) => void;
+  onConfirm?: (compromisso: Compromisso) => void;
+  onCancel?: (compromisso: Compromisso) => void;
 }
 
 const tipoColors: Record<string, string> = {
@@ -20,7 +23,9 @@ export const AgendaWeekView = ({
   compromissos, 
   selectedDate, 
   onSelectDate, 
-  onSelectCompromisso 
+  onSelectCompromisso,
+  onConfirm,
+  onCancel
 }: AgendaWeekViewProps) => {
   const weekStart = startOfWeek(selectedDate, { weekStartsOn: 0 });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
@@ -31,86 +36,104 @@ export const AgendaWeekView = ({
       .sort((a, b) => a.hora.localeCompare(b.hora));
   };
 
-  return (
-    <div className="flex gap-1.5 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
-      {weekDays.map((day) => {
-        const dayCompromissos = getCompromissosForDay(day);
-        const isSelected = isSameDay(day, selectedDate);
-        const isToday = isSameDay(day, new Date());
+  const selectedDayCompromissos = getCompromissosForDay(selectedDate);
 
-        return (
-          <div
-            key={day.toISOString()}
-            className={cn(
-              "flex-shrink-0 w-[100px] rounded-xl p-2 transition-all duration-200 cursor-pointer",
-              isSelected ? "bg-primary/10 ring-2 ring-primary" : "bg-secondary/50",
-              isToday && !isSelected && "ring-1 ring-primary/50"
-            )}
-            onClick={() => onSelectDate(day)}
-          >
-            {/* Day Header - Compact */}
-            <div className="text-center mb-2 pb-1.5 border-b border-border/30">
-              <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-wider">
-                {format(day, 'EEE', { locale: ptBR })}
-              </p>
-              <p className={cn(
-                "text-xl font-bold",
-                isToday ? "text-primary" : isSelected ? "text-primary" : "text-foreground"
+  return (
+    <div className="space-y-4">
+      {/* Day Selector - Horizontal */}
+      <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+        {weekDays.map((day) => {
+          const dayCompromissos = getCompromissosForDay(day);
+          const isSelected = isSameDay(day, selectedDate);
+          const isToday = isSameDay(day, new Date());
+
+          return (
+            <button
+              key={day.toISOString()}
+              onClick={() => onSelectDate(day)}
+              className={cn(
+                "flex-shrink-0 flex flex-col items-center justify-center w-12 h-16 rounded-2xl transition-all duration-200",
+                isSelected 
+                  ? "bg-primary text-primary-foreground shadow-lg scale-105" 
+                  : "bg-secondary/50 hover:bg-secondary",
+                isToday && !isSelected && "ring-2 ring-primary/50"
+              )}
+            >
+              <span className={cn(
+                "text-[10px] font-medium uppercase tracking-wide",
+                isSelected ? "text-primary-foreground/80" : "text-muted-foreground"
+              )}>
+                {format(day, 'EEE', { locale: ptBR }).slice(0, 3)}
+              </span>
+              <span className={cn(
+                "text-lg font-bold",
+                isSelected ? "text-primary-foreground" : "text-foreground"
               )}>
                 {format(day, 'd')}
-              </p>
+              </span>
+              {/* Dots indicator */}
               {dayCompromissos.length > 0 && (
-                <div className="flex justify-center gap-0.5 mt-1">
-                  {dayCompromissos.slice(0, 4).map((c, i) => (
+                <div className="flex gap-0.5 mt-0.5">
+                  {dayCompromissos.slice(0, 3).map((c, i) => (
                     <div 
                       key={i} 
-                      className={cn("w-1.5 h-1.5 rounded-full", tipoColors[c.tipo] || 'bg-muted')}
+                      className={cn(
+                        "w-1.5 h-1.5 rounded-full",
+                        isSelected ? "bg-primary-foreground/70" : tipoColors[c.tipo] || 'bg-muted'
+                      )}
                     />
                   ))}
+                  {dayCompromissos.length > 3 && (
+                    <span className={cn(
+                      "text-[8px] font-medium ml-0.5",
+                      isSelected ? "text-primary-foreground/70" : "text-muted-foreground"
+                    )}>
+                      +{dayCompromissos.length - 3}
+                    </span>
+                  )}
                 </div>
               )}
-            </div>
+            </button>
+          );
+        })}
+      </div>
 
-            {/* Compromissos - Ultra Compact */}
-            <div className="space-y-1">
-              {dayCompromissos.length === 0 ? (
-                <p className="text-[9px] text-muted-foreground/50 text-center py-2">—</p>
-              ) : (
-                dayCompromissos.slice(0, 5).map((compromisso) => (
-                  <button
-                    key={compromisso.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSelectCompromisso(compromisso);
-                    }}
-                    className="w-full flex items-stretch rounded-xl bg-card/80 hover:bg-card transition-colors text-left overflow-hidden"
-                  >
-                    {/* Color indicator - full height bar */}
-                    <div className={cn(
-                      "w-[3px] flex-shrink-0",
-                      tipoColors[compromisso.tipo] || 'bg-muted'
-                    )} />
-                    
-                    <div className="flex-1 min-w-0 py-1.5 px-2">
-                      <p className="text-[11px] font-bold text-foreground">
-                        {compromisso.hora}
-                      </p>
-                      <p className="text-[9px] text-muted-foreground truncate">
-                        {compromisso.cliente.split(' ')[0]}
-                      </p>
-                    </div>
-                  </button>
-                ))
-              )}
-              {dayCompromissos.length > 5 && (
-                <p className="text-[9px] text-primary text-center font-medium">
-                  +{dayCompromissos.length - 5}
-                </p>
-              )}
+      {/* Selected Day Header */}
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-foreground">
+          {format(selectedDate, "EEEE, d 'de' MMMM", { locale: ptBR })}
+        </h3>
+        <span className="text-xs text-muted-foreground">
+          {selectedDayCompromissos.length} compromisso{selectedDayCompromissos.length !== 1 ? 's' : ''}
+        </span>
+      </div>
+
+      {/* Appointments List */}
+      <div className="space-y-3">
+        {selectedDayCompromissos.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="w-16 h-16 rounded-full bg-secondary/50 flex items-center justify-center mb-3">
+              <span className="text-2xl">📅</span>
             </div>
+            <p className="text-sm text-muted-foreground">
+              Nenhum compromisso neste dia
+            </p>
+            <p className="text-xs text-muted-foreground/70 mt-1">
+              Toque em + para agendar
+            </p>
           </div>
-        );
-      })}
+        ) : (
+          selectedDayCompromissos.map((compromisso) => (
+            <SwipeableCompromissoCard
+              key={compromisso.id}
+              compromisso={compromisso}
+              onClick={() => onSelectCompromisso(compromisso)}
+              onConfirm={onConfirm ? () => onConfirm(compromisso) : undefined}
+              onCancel={onCancel ? () => onCancel(compromisso) : undefined}
+            />
+          ))
+        )}
+      </div>
     </div>
   );
 };
