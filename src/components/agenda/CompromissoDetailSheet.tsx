@@ -178,7 +178,7 @@ export const CompromissoDetailSheet = ({
         </div>
 
         {/* Content */}
-        <div className="px-4 pb-4 overflow-y-auto max-h-[calc(85vh-40px)]">
+        <div className="px-4 pb-4">
           {/* Header */}
           <div className="flex items-center gap-4 mb-6">
             <div className={cn(
