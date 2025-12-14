@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { useCompromissos, Compromisso } from '@/hooks/useCompromissos';
 import { SwipeableCompromissoCard } from '@/components/agenda/SwipeableCompromissoCard';
@@ -7,7 +7,7 @@ import { AgendaEmptyState } from '@/components/agenda/AgendaEmptyState';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { VisitaForm } from '@/components/forms/VisitaForm';
 import { cn } from '@/lib/utils';
-import { format, isSameDay, parseISO } from 'date-fns';
+import { format, isSameDay, parseISO, startOfWeek, addDays, isToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
 
@@ -26,6 +26,17 @@ export const AgendaPage = ({ onBack }: AgendaPageProps) => {
   
   const { compromissos, loading, updateCompromisso } = useCompromissos();
   
+  // Generate week days starting from the week of selected date
+  const weekDays = useMemo(() => {
+    const start = startOfWeek(selectedDate, { weekStartsOn: 0 }); // Sunday
+    return Array.from({ length: 7 }, (_, i) => addDays(start, i));
+  }, [selectedDate]);
+
+  // Count compromissos per day for the week
+  const getCompromissosCountForDay = (date: Date) => {
+    return compromissos.filter(c => isSameDay(parseISO(c.data), date)).length;
+  };
+  
   // Filter compromissos for selected date
   const filteredCompromissos = compromissos.filter(c => {
     const compromissoDate = parseISO(c.data);
@@ -40,9 +51,9 @@ export const AgendaPage = ({ onBack }: AgendaPageProps) => {
     });
   };
   
-  const navigateDate = (direction: 'prev' | 'next') => {
+  const navigateWeek = (direction: 'prev' | 'next') => {
     const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() + (direction === 'next' ? 1 : -1));
+    newDate.setDate(newDate.getDate() + (direction === 'next' ? 7 : -7));
     setSelectedDate(newDate);
   };
 
@@ -92,15 +103,82 @@ export const AgendaPage = ({ onBack }: AgendaPageProps) => {
       <header className="sticky top-0 z-40 glassmorphism px-4 py-3">
         <PageHeader title="Agenda" onBack={onBack} />
         
-        {/* Date Navigator */}
+        {/* Week Mini Calendar */}
         <div className="flex items-center justify-between mb-3">
           <button 
-            onClick={() => navigateDate('prev')}
-            className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center animate-scale-press"
+            onClick={() => navigateWeek('prev')}
+            className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center animate-scale-press"
           >
-            <ChevronLeft className="w-5 h-5 text-foreground" />
+            <ChevronLeft className="w-4 h-4 text-foreground" />
           </button>
           
+          <div className="flex gap-1.5 flex-1 justify-center">
+            {weekDays.map((day) => {
+              const count = getCompromissosCountForDay(day);
+              const isSelected = isSameDay(day, selectedDate);
+              const isTodayDate = isToday(day);
+              
+              return (
+                <button
+                  key={day.toISOString()}
+                  onClick={() => setSelectedDate(day)}
+                  className={cn(
+                    "flex flex-col items-center py-2 px-2.5 rounded-xl transition-all duration-200 animate-scale-press min-w-[40px]",
+                    isSelected 
+                      ? "bg-primary text-primary-foreground" 
+                      : isTodayDate 
+                        ? "bg-primary/20" 
+                        : "bg-secondary"
+                  )}
+                >
+                  <span className={cn(
+                    "text-[10px] font-medium uppercase",
+                    isSelected ? "text-primary-foreground" : "text-muted-foreground"
+                  )}>
+                    {format(day, 'EEE', { locale: ptBR }).slice(0, 3)}
+                  </span>
+                  <span className={cn(
+                    "text-sm font-semibold",
+                    isSelected ? "text-primary-foreground" : "text-foreground"
+                  )}>
+                    {format(day, 'd')}
+                  </span>
+                  {/* Indicator dots */}
+                  <div className="flex gap-0.5 mt-1 h-1.5">
+                    {count > 0 && (
+                      <div className={cn(
+                        "w-1.5 h-1.5 rounded-full",
+                        isSelected ? "bg-primary-foreground" : "bg-primary"
+                      )} />
+                    )}
+                    {count > 2 && (
+                      <div className={cn(
+                        "w-1.5 h-1.5 rounded-full",
+                        isSelected ? "bg-primary-foreground/60" : "bg-primary/60"
+                      )} />
+                    )}
+                    {count > 4 && (
+                      <div className={cn(
+                        "w-1.5 h-1.5 rounded-full",
+                        isSelected ? "bg-primary-foreground/40" : "bg-primary/40"
+                      )} />
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          
+          <button 
+            onClick={() => navigateWeek('next')}
+            className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center animate-scale-press"
+          >
+            <ChevronRight className="w-4 h-4 text-foreground" />
+          </button>
+        </div>
+
+        {/* Selected Date Info */}
+        <div className="flex items-center justify-center mb-3">
           <div className="flex flex-col items-center">
             <p className="text-sm font-medium text-foreground capitalize">
               {formatDate(selectedDate)}
@@ -114,13 +192,6 @@ export const AgendaPage = ({ onBack }: AgendaPageProps) => {
               {filteredCompromissos.length} {filteredCompromissos.length === 1 ? 'compromisso' : 'compromissos'}
             </span>
           </div>
-          
-          <button 
-            onClick={() => navigateDate('next')}
-            className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center animate-scale-press"
-          >
-            <ChevronRight className="w-5 h-5 text-foreground" />
-          </button>
         </div>
         
         {/* View Toggle */}
