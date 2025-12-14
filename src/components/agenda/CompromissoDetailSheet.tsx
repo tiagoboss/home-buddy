@@ -144,18 +144,18 @@ export const CompromissoDetailSheet = ({
 
   return (
     <>
-      {/* Overlay - apenas acima do tab bar */}
+      {/* Overlay - cobre toda a tela */}
       <div 
-        className="absolute inset-0 bottom-[72px] bg-black z-50 animate-fade-in transition-opacity duration-200"
+        className="absolute inset-0 bg-black z-50 animate-fade-in transition-opacity duration-200"
         style={{ opacity: overlayOpacity }}
         onClick={onClose}
       />
       
-      {/* Sheet */}
+      {/* Sheet - ancorado no fundo */}
       <div 
         className={cn(
-          "absolute bottom-[72px] left-0 right-0 z-50 bg-card rounded-t-3xl",
-          "touch-none",
+          "absolute bottom-0 left-0 right-0 z-50 bg-card rounded-t-3xl",
+          "touch-none max-h-[85%] overflow-hidden",
           !isClosing && dragOffset === 0 && "animate-slide-up-sheet",
           isClosing && "transition-transform duration-200 ease-out"
         )}
@@ -177,8 +177,8 @@ export const CompromissoDetailSheet = ({
           )} />
         </div>
 
-        {/* Content */}
-        <div className="px-4 pb-8">
+        {/* Content - com padding para o tab bar */}
+        <div className="px-4 pb-[88px] overflow-y-auto max-h-[calc(85vh-40px)]">
           {/* Header */}
           <div className="flex items-center gap-4 mb-6">
             <div className={cn(
