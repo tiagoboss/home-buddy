@@ -17,10 +17,6 @@ import { corretor, getRankingBadge, formatCurrency } from '@/data/mockData';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { cn } from '@/lib/utils';
 
-interface PerfilPageProps {
-  onBack?: () => void;
-}
-
 const avaliacoes = [
   {
     id: 1,
@@ -82,7 +78,7 @@ const themeOptions = [
   { value: 'system', icon: Monitor, label: 'Sistema' },
 ];
 
-export const PerfilPage = ({ onBack }: PerfilPageProps) => {
+export const PerfilPage = () => {
   const { theme, setTheme } = useTheme();
   const [showAllReviews, setShowAllReviews] = useState(false);
   
@@ -94,7 +90,7 @@ export const PerfilPage = ({ onBack }: PerfilPageProps) => {
     <div className="bg-background pb-4 animate-fade-in">
       {/* Header */}
       <header className="px-4 pt-4 pb-4">
-        <PageHeader title="Meu Perfil" onBack={onBack} />
+        <PageHeader title="Meu Perfil" />
         <div className="flex flex-col items-center mt-2">
           <div className="relative mb-3">
             <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-2xl font-bold text-primary">

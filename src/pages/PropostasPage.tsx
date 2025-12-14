@@ -17,11 +17,7 @@ const filters = [
   { id: 'expirada', label: 'Expiradas' },
 ];
 
-interface PropostasPageProps {
-  onBack?: () => void;
-}
-
-export const PropostasPage = ({ onBack }: PropostasPageProps) => {
+export const PropostasPage = () => {
   const { propostas, loading, fetchPropostas, updateProposta } = usePropostas();
   const [activeFilter, setActiveFilter] = useState('todos');
   const [searchQuery, setSearchQuery] = useState('');
@@ -87,7 +83,6 @@ export const PropostasPage = ({ onBack }: PropostasPageProps) => {
       <header className="sticky top-0 z-40 glassmorphism px-4 py-3">
         <PageHeader
           title="Propostas"
-          onBack={onBack}
           rightContent={
             <Button
               variant="ghost"

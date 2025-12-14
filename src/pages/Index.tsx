@@ -57,7 +57,7 @@ const Index = () => {
     setActiveForm(action);
   };
   
-  const handleGoHome = () => setActiveTab('home');
+  
 
   const handleImovelFavorite = () => {
     if (selectedImovelGlobal) {
@@ -77,23 +77,21 @@ const Index = () => {
         return (
           <LeadsPage 
             onScheduleVisit={() => setActiveForm('visita')}
-            onBack={handleGoHome}
             onSelectLead={setSelectedLeadGlobal}
           />
         );
       case 'imoveis':
         return (
           <ImoveisPage 
-            onBack={handleGoHome}
             onSelectImovel={setSelectedImovelGlobal}
           />
         );
       case 'agenda':
-        return <AgendaPage onBack={handleGoHome} />;
+        return <AgendaPage />;
       case 'perfil':
-        return <PerfilPage onBack={handleGoHome} />;
+        return <PerfilPage />;
       case 'propostas':
-        return <PropostasPage onBack={handleGoHome} />;
+        return <PropostasPage />;
       default:
         return <HomePage />;
     }
