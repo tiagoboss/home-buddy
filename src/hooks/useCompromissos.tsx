@@ -111,14 +111,16 @@ const getMockCompromissos = (): Compromisso[] => {
 
 export const useCompromissos = () => {
   const { user } = useAuth();
-  const [compromissos, setCompromissos] = useState<Compromisso[]>([]);
+  const [compromissos, setCompromissos] = useState<Compromisso[]>(getMockCompromissos());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [useMockData, setUseMockData] = useState(true);
 
   const fetchCompromissos = async () => {
-    // Use mock data when not authenticated
+    // Always show mock data first, then try to fetch real data
     if (!user) {
       setCompromissos(getMockCompromissos());
+      setUseMockData(true);
       setLoading(false);
       return;
     }
@@ -140,14 +142,17 @@ export const useCompromissos = () => {
       // Fallback to mock data if database is empty
       if (!data || data.length === 0) {
         setCompromissos(getMockCompromissos());
+        setUseMockData(true);
       } else {
         setCompromissos(data as Compromisso[]);
+        setUseMockData(false);
       }
     } catch (err: any) {
       console.error('Error fetching compromissos:', err);
       setError(err.message);
       // Use mock data on error as well
       setCompromissos(getMockCompromissos());
+      setUseMockData(true);
     } finally {
       setLoading(false);
     }
@@ -208,6 +213,7 @@ export const useCompromissos = () => {
     compromissos,
     loading,
     error,
+    useMockData,
     fetchCompromissos,
     createCompromisso,
     updateCompromisso,
