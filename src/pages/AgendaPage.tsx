@@ -2,12 +2,9 @@ import { useState, useMemo, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Loader2, CalendarDays } from 'lucide-react';
 import { useCompromissos, Compromisso } from '@/hooks/useCompromissos';
 import { SwipeableCompromissoCard } from '@/components/agenda/SwipeableCompromissoCard';
-import { CompromissoDetailSheet } from '@/components/agenda/CompromissoDetailSheet';
 import { AgendaWeekView } from '@/components/agenda/AgendaWeekView';
 import { AgendaMonthView } from '@/components/agenda/AgendaMonthView';
-import { RescheduleSheet } from '@/components/agenda/RescheduleSheet';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { VisitaForm } from '@/components/forms/VisitaForm';
 import { cn } from '@/lib/utils';
 import { format, isSameDay, parseISO, isToday, addMonths, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -16,13 +13,13 @@ import { toast } from 'sonner';
 const views = ['Semana', 'Mês'];
 const SWIPE_THRESHOLD = 50;
 
-export const AgendaPage = () => {
+interface AgendaPageProps {
+  onSelectCompromisso?: (compromisso: Compromisso) => void;
+}
+
+export const AgendaPage = ({ onSelectCompromisso }: AgendaPageProps) => {
   const [activeView, setActiveView] = useState('Semana');
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedCompromisso, setSelectedCompromisso] = useState<Compromisso | null>(null);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [isVisitaFormOpen, setIsVisitaFormOpen] = useState(false);
-  const [isRescheduleOpen, setIsRescheduleOpen] = useState(false);
   const [swipeOffset, setSwipeOffset] = useState(0);
   
   // Touch handling refs
@@ -74,13 +71,7 @@ export const AgendaPage = () => {
   };
 
   const handleCardClick = (compromisso: Compromisso) => {
-    setSelectedCompromisso(compromisso);
-    setIsDetailOpen(true);
-  };
-
-  const handleCloseDetail = () => {
-    setIsDetailOpen(false);
-    setTimeout(() => setSelectedCompromisso(null), 200);
+    onSelectCompromisso?.(compromisso);
   };
 
   const handleConfirm = async (compromisso: Compromisso) => {
@@ -89,7 +80,6 @@ export const AgendaPage = () => {
       toast.error('Erro ao confirmar compromisso');
     } else {
       toast.success('Compromisso confirmado!');
-      if (isDetailOpen) handleCloseDetail();
     }
   };
 
@@ -99,32 +89,7 @@ export const AgendaPage = () => {
       toast.error('Erro ao cancelar compromisso');
     } else {
       toast.success('Compromisso cancelado');
-      if (isDetailOpen) handleCloseDetail();
     }
-  };
-
-  const handleComplete = async (compromisso: Compromisso) => {
-    const { error } = await updateCompromisso(compromisso.id, { status: 'realizado' });
-    if (error) {
-      toast.error('Erro ao marcar como realizado');
-    } else {
-      toast.success('Compromisso realizado!');
-      if (isDetailOpen) handleCloseDetail();
-    }
-  };
-
-  const handleReschedule = async (id: string, newDate: string, newTime: string) => {
-    const { error } = await updateCompromisso(id, { data: newDate, hora: newTime });
-    if (error) {
-      toast.error('Erro ao reagendar compromisso');
-    } else {
-      toast.success('Compromisso reagendado!');
-      handleCloseDetail();
-    }
-  };
-
-  const openRescheduleSheet = () => {
-    setIsRescheduleOpen(true);
   };
 
   const isTodaySelected = isToday(selectedDate);
@@ -252,31 +217,6 @@ export const AgendaPage = () => {
           </div>
         )}
       </main>
-
-      {/* Detail Sheet */}
-      <CompromissoDetailSheet
-        compromisso={selectedCompromisso}
-        isOpen={isDetailOpen}
-        onClose={handleCloseDetail}
-        onConfirm={selectedCompromisso ? () => handleConfirm(selectedCompromisso) : undefined}
-        onCancel={selectedCompromisso ? () => handleCancel(selectedCompromisso) : undefined}
-        onComplete={selectedCompromisso ? () => handleComplete(selectedCompromisso) : undefined}
-        onReschedule={openRescheduleSheet}
-      />
-
-      {/* Reschedule Sheet */}
-      <RescheduleSheet
-        compromisso={selectedCompromisso}
-        isOpen={isRescheduleOpen}
-        onClose={() => setIsRescheduleOpen(false)}
-        onReschedule={handleReschedule}
-      />
-
-      {/* Visita Form */}
-      <VisitaForm 
-        isOpen={isVisitaFormOpen} 
-        onClose={() => setIsVisitaFormOpen(false)} 
-      />
     </div>
   );
 };
