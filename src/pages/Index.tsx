@@ -191,7 +191,11 @@ const Index = () => {
           />
         );
       case 'agenda':
-        return <AgendaPage />;
+        return (
+          <AgendaPage 
+            onSelectCompromisso={setSelectedCompromissoGlobal}
+          />
+        );
       case 'perfil':
         return <PerfilPage />;
       case 'propostas':
