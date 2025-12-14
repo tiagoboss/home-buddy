@@ -71,17 +71,22 @@ export const SwipeableCompromissoCard = ({
 
   return (
     <div className="relative overflow-hidden rounded-2xl">
-      {/* Background Actions */}
-      <div className="absolute inset-0 flex">
+      {/* Background Actions - Only visible when swiping */}
+      <div className={cn(
+        "absolute inset-0 flex transition-opacity duration-150",
+        translateX === 0 ? "opacity-0 pointer-events-none" : "opacity-100"
+      )}>
+        {/* Left action (swipe right to confirm) */}
         <div className={cn(
           "flex-1 flex items-center justify-start pl-6 bg-success transition-opacity duration-200",
-          translateX > 40 ? "opacity-100" : "opacity-50"
+          translateX > 0 ? "opacity-100" : "opacity-0"
         )}>
           <Check className="w-6 h-6 text-white" />
         </div>
+        {/* Right action (swipe left to cancel) */}
         <div className={cn(
           "flex-1 flex items-center justify-end pr-6 bg-destructive transition-opacity duration-200",
-          translateX < -40 ? "opacity-100" : "opacity-50"
+          translateX < 0 ? "opacity-100" : "opacity-0"
         )}>
           <X className="w-6 h-6 text-white" />
         </div>
