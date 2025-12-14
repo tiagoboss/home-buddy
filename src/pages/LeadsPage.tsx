@@ -112,15 +112,20 @@ export const LeadsPage = ({ onScheduleVisit, onBack, onSelectLead }: LeadsPagePr
       </header>
       
       {/* Leads List */}
-      <main className="px-4 py-4 animate-fade-in">
+      <main className="px-4 py-4">
         <div className="space-y-2">
-          {filteredLeads.map((lead) => (
-            <SwipeableLeadCard
+          {filteredLeads.map((lead, index) => (
+            <div
               key={lead.id}
-              lead={lead}
-              onClick={() => onSelectLead?.(lead)}
-              onDelete={() => deleteLead(lead.id)}
-            />
+              className="animate-fade-in"
+              style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'backwards' }}
+            >
+              <SwipeableLeadCard
+                lead={lead}
+                onClick={() => onSelectLead?.(lead)}
+                onDelete={() => deleteLead(lead.id)}
+              />
+            </div>
           ))}
         </div>
         
