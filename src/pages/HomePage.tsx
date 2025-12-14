@@ -26,7 +26,7 @@ export const HomePage = ({ onTabChange, onSelectCompromisso, onSelectLead, onSel
   
   return (
     <div className="bg-background">
-      <main className="py-4 space-y-5 animate-fade-in">
+      <main className="py-4 space-y-5 transition-all duration-300 ease-out animate-fade-in">
         {/* KPIs */}
         <section className="px-4">
           <div className="flex gap-2.5 overflow-x-auto pb-2 hide-scrollbar snap-x-mandatory scroll-pl-0 -mr-4 pr-4">
