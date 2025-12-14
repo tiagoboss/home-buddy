@@ -177,8 +177,8 @@ export const CompromissoDetailSheet = ({
           )} />
         </div>
 
-        {/* Content - com padding para o tab bar */}
-        <div className="px-4 pb-[88px] overflow-y-auto max-h-[calc(85vh-40px)]">
+        {/* Content */}
+        <div className="px-4 pb-4 overflow-y-auto max-h-[calc(85vh-40px)]">
           {/* Header */}
           <div className="flex items-center gap-4 mb-6">
             <div className={cn(
