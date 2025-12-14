@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Search, Filter, Loader2, RefreshCw } from 'lucide-react';
 import { SwipeableLeadCard } from '@/components/leads/SwipeableLeadCard';
-import { LeadDetailSheet } from '@/components/leads/LeadDetailSheet';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useLeads, Lead } from '@/hooks/useLeads';
 import { cn } from '@/lib/utils';
@@ -21,13 +20,13 @@ const filters = [
 interface LeadsPageProps {
   onScheduleVisit?: (lead: Lead) => void;
   onBack?: () => void;
+  onSelectLead?: (lead: Lead) => void;
 }
 
-export const LeadsPage = ({ onScheduleVisit, onBack }: LeadsPageProps) => {
+export const LeadsPage = ({ onScheduleVisit, onBack, onSelectLead }: LeadsPageProps) => {
   const { leads, loading, fetchLeads, deleteLead } = useLeads();
   const [activeFilter, setActiveFilter] = useState('todos');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = async () => {
@@ -125,7 +124,7 @@ export const LeadsPage = ({ onScheduleVisit, onBack }: LeadsPageProps) => {
                 <SwipeableLeadCard
                   key={lead.id}
                   lead={lead}
-                  onClick={() => setSelectedLead(lead)}
+                  onClick={() => onSelectLead?.(lead)}
                   onDelete={() => deleteLead(lead.id)}
                 />
               ))}
@@ -147,17 +146,6 @@ export const LeadsPage = ({ onScheduleVisit, onBack }: LeadsPageProps) => {
           </>
         )}
       </main>
-
-      {/* Lead Detail Sheet */}
-      <LeadDetailSheet
-        lead={selectedLead}
-        isOpen={!!selectedLead}
-        onClose={() => setSelectedLead(null)}
-        onScheduleVisit={(lead) => {
-          setSelectedLead(null);
-          onScheduleVisit?.(lead);
-        }}
-      />
     </div>
   );
 };
