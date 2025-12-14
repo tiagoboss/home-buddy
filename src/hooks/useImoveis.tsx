@@ -24,6 +24,7 @@ export interface Imovel {
   entrega: string | null;
   construtora: string | null;
   foto: string | null;
+  fotos: string[] | null;
   novo: boolean;
   baixou_preco: boolean;
   favorito: boolean;

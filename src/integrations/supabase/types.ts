@@ -126,6 +126,7 @@ export type Database = {
           entrega: string | null
           favorito: boolean | null
           foto: string | null
+          fotos: string[] | null
           id: string
           iptu: number | null
           modalidade: string | null
@@ -153,6 +154,7 @@ export type Database = {
           entrega?: string | null
           favorito?: boolean | null
           foto?: string | null
+          fotos?: string[] | null
           id?: string
           iptu?: number | null
           modalidade?: string | null
@@ -180,6 +182,7 @@ export type Database = {
           entrega?: string | null
           favorito?: boolean | null
           foto?: string | null
+          fotos?: string[] | null
           id?: string
           iptu?: number | null
           modalidade?: string | null

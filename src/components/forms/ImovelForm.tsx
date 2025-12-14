@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Trash2 } from 'lucide-react';
+import { X, Trash2, Plus, ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -25,6 +25,8 @@ interface ImovelFormProps {
   onDeleted?: () => void;
 }
 
+const MAX_PHOTOS = 10;
+
 export const ImovelForm = ({ isOpen, onClose, editData, onDeleted }: ImovelFormProps) => {
   const { createImovel, updateImovel, deleteImovel } = useImoveis();
   const [loading, setLoading] = useState(false);
@@ -41,7 +43,7 @@ export const ImovelForm = ({ isOpen, onClose, editData, onDeleted }: ImovelFormP
     vagas: string;
     area: string;
     condominio: string;
-    foto: string;
+    fotos: string[];
     telefoneContato: string;
   }>({
     titulo: '',
@@ -55,7 +57,7 @@ export const ImovelForm = ({ isOpen, onClose, editData, onDeleted }: ImovelFormP
     vagas: '',
     area: '',
     condominio: '',
-    foto: '',
+    fotos: [''],
     telefoneContato: '',
   });
 
@@ -63,6 +65,15 @@ export const ImovelForm = ({ isOpen, onClose, editData, onDeleted }: ImovelFormP
 
   useEffect(() => {
     if (editData) {
+      // Combine foto and fotos into a single array
+      const allPhotos: string[] = [];
+      if (editData.foto) allPhotos.push(editData.foto);
+      if (editData.fotos && editData.fotos.length > 0) {
+        editData.fotos.forEach(f => {
+          if (f && !allPhotos.includes(f)) allPhotos.push(f);
+        });
+      }
+      
       setFormData({
         titulo: editData.titulo,
         tipo: editData.tipo,
@@ -75,7 +86,7 @@ export const ImovelForm = ({ isOpen, onClose, editData, onDeleted }: ImovelFormP
         vagas: editData.vagas.toString(),
         area: editData.area.toString(),
         condominio: editData.condominio?.toString() || '',
-        foto: editData.foto || '',
+        fotos: allPhotos.length > 0 ? allPhotos : [''],
         telefoneContato: editData.telefone_contato || '',
       });
     } else {
@@ -91,11 +102,28 @@ export const ImovelForm = ({ isOpen, onClose, editData, onDeleted }: ImovelFormP
         vagas: '',
         area: '',
         condominio: '',
-        foto: '',
+        fotos: [''],
         telefoneContato: '',
       });
     }
   }, [editData, isOpen]);
+
+  const handleAddPhoto = () => {
+    if (formData.fotos.length < MAX_PHOTOS) {
+      setFormData({ ...formData, fotos: [...formData.fotos, ''] });
+    }
+  };
+
+  const handleRemovePhoto = (index: number) => {
+    const newFotos = formData.fotos.filter((_, i) => i !== index);
+    setFormData({ ...formData, fotos: newFotos.length > 0 ? newFotos : [''] });
+  };
+
+  const handlePhotoChange = (index: number, value: string) => {
+    const newFotos = [...formData.fotos];
+    newFotos[index] = value;
+    setFormData({ ...formData, fotos: newFotos });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,6 +141,11 @@ export const ImovelForm = ({ isOpen, onClose, editData, onDeleted }: ImovelFormP
 
     setLoading(true);
     try {
+      // Filter out empty photo URLs
+      const validFotos = formData.fotos.filter(f => f.trim() !== '');
+      const fotoPrincipal = validFotos[0] || null;
+      const fotosAdicionais = validFotos.slice(1);
+
       const imovelData = {
         titulo: formData.titulo.trim(),
         tipo: formData.tipo,
@@ -130,7 +163,8 @@ export const ImovelForm = ({ isOpen, onClose, editData, onDeleted }: ImovelFormP
         caracteristicas: null,
         entrega: null,
         construtora: null,
-        foto: formData.foto || null,
+        foto: fotoPrincipal,
+        fotos: fotosAdicionais.length > 0 ? fotosAdicionais : null,
         novo: !isEditMode,
         baixou_preco: false,
         favorito: editData?.favorito || false,
@@ -414,17 +448,66 @@ export const ImovelForm = ({ isOpen, onClose, editData, onDeleted }: ImovelFormP
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="foto">URL da Foto</Label>
-              <Input
-                id="foto"
-                type="url"
-                placeholder="https://..."
-                value={formData.foto}
-                onChange={(e) => setFormData({ ...formData, foto: e.target.value })}
-                className="h-12 rounded-xl"
-                maxLength={500}
-              />
+            {/* Photos Section */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="flex items-center gap-2">
+                  <ImageIcon className="w-4 h-4" />
+                  Fotos ({formData.fotos.filter(f => f.trim()).length}/{MAX_PHOTOS})
+                </Label>
+                {formData.fotos.length < MAX_PHOTOS && (
+                  <button
+                    type="button"
+                    onClick={handleAddPhoto}
+                    className="flex items-center gap-1 text-sm text-primary hover:underline"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Adicionar
+                  </button>
+                )}
+              </div>
+              
+              <p className="text-xs text-muted-foreground">
+                A primeira foto será a capa do imóvel
+              </p>
+
+              <div className="space-y-2">
+                {formData.fotos.map((foto, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <div className="flex-1 relative">
+                      <Input
+                        type="url"
+                        placeholder={index === 0 ? 'URL da foto de capa' : `URL da foto ${index + 1}`}
+                        value={foto}
+                        onChange={(e) => handlePhotoChange(index, e.target.value)}
+                        className="h-12 rounded-xl pr-10"
+                        maxLength={500}
+                      />
+                      {foto && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded overflow-hidden bg-muted">
+                          <img 
+                            src={foto} 
+                            alt="" 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    {formData.fotos.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemovePhoto(index)}
+                        className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center shrink-0"
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
 
             <Button 

@@ -51,6 +51,7 @@ export interface Imovel {
   vagas: number;
   area: number;
   foto: string;
+  fotos?: string[];
   condominio?: number;
   iptu?: number;
   descricao?: string;
