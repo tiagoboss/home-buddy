@@ -68,19 +68,22 @@ export const SwipeableLeadCard = ({ lead, onClick, onDelete }: SwipeableLeadCard
 
   return (
     <div className="relative overflow-hidden rounded-xl">
-      {/* Background Actions */}
-      <div className="absolute inset-0 flex">
+      {/* Background Actions - Only visible when swiping */}
+      <div className={cn(
+        "absolute inset-0 flex transition-opacity duration-150 rounded-xl overflow-hidden",
+        translateX === 0 ? "opacity-0 pointer-events-none" : "opacity-100"
+      )}>
         {/* Left side - Call (shown on right swipe) */}
         <div className={cn(
-          "flex-1 flex items-center justify-start pl-4 bg-info transition-opacity",
-          translateX > 40 ? "opacity-100" : "opacity-50"
+          "flex-1 flex items-center justify-start pl-4 bg-info transition-opacity duration-200",
+          translateX > 0 ? "opacity-100" : "opacity-0"
         )}>
           <Phone className="w-6 h-6 text-white" />
         </div>
         {/* Right side - WhatsApp (shown on left swipe) */}
         <div className={cn(
-          "flex-1 flex items-center justify-end pr-4 bg-success transition-opacity",
-          translateX < -40 ? "opacity-100" : "opacity-50"
+          "flex-1 flex items-center justify-end pr-4 bg-success transition-opacity duration-200",
+          translateX < 0 ? "opacity-100" : "opacity-0"
         )}>
           <MessageCircle className="w-6 h-6 text-white" />
         </div>
