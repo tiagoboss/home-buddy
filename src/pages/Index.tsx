@@ -21,10 +21,13 @@ import { CheckinForm } from '@/components/forms/CheckinForm';
 import { NotificationsSheet } from '@/components/notifications/NotificationsSheet';
 import { ImovelDetailSheet } from '@/components/imoveis/ImovelDetailSheet';
 import { LeadDetailSheet } from '@/components/leads/LeadDetailSheet';
-import { TabType, Notificacao, Imovel } from '@/types';
+import { CompromissoDetailSheet } from '@/components/agenda/CompromissoDetailSheet';
+import { TabType, Notificacao, Imovel, Compromisso as MockCompromisso, Lead as MockLead } from '@/types';
 import { Lead } from '@/hooks/useLeads';
+import { Compromisso as HookCompromisso } from '@/hooks/useCompromissos';
 import { notificacoes as initialNotificacoes } from '@/data/mockData';
 import { useFavoritos } from '@/hooks/useFavoritos';
+
 const Index = () => {
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
@@ -35,7 +38,42 @@ const Index = () => {
   // Global detail states
   const [selectedImovelGlobal, setSelectedImovelGlobal] = useState<Imovel | null>(null);
   const [selectedLeadGlobal, setSelectedLeadGlobal] = useState<Lead | null>(null);
+  const [selectedCompromissoGlobal, setSelectedCompromissoGlobal] = useState<HookCompromisso | null>(null);
   const { isFavorito, toggleFavorito } = useFavoritos();
+
+  // Convert mock compromisso to hook format for global sheet
+  const convertMockCompromisso = (c: MockCompromisso): HookCompromisso => ({
+    id: c.id,
+    user_id: '',
+    tipo: c.tipo,
+    data: c.data,
+    hora: c.hora,
+    cliente: c.cliente,
+    imovel: c.imovel || null,
+    endereco: c.endereco || null,
+    status: c.status,
+    lead_id: null,
+    lead: null,
+    created_at: c.data,
+    updated_at: c.data,
+  });
+
+  // Convert mock lead to Lead format for global sheet
+  const convertMockLead = (l: MockLead): Lead => ({
+    id: l.id,
+    user_id: '',
+    nome: l.nome,
+    telefone: l.telefone,
+    email: l.email || null,
+    status: l.status as Lead['status'],
+    interesse: l.interesse,
+    faixa_preco: null,
+    bairros: null,
+    ultimo_contato: l.ultimoContato,
+    avatar: l.avatar,
+    created_at: l.ultimoContato,
+    updated_at: l.ultimoContato,
+  });
 
   const unreadCount = notifications.filter(n => !n.lida).length;
 
@@ -72,7 +110,14 @@ const Index = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
-        return <HomePage onTabChange={setActiveTab} />;
+        return (
+          <HomePage 
+            onTabChange={setActiveTab}
+            onSelectCompromisso={(c) => setSelectedCompromissoGlobal(convertMockCompromisso(c))}
+            onSelectLead={(l) => setSelectedLeadGlobal(convertMockLead(l))}
+            onSelectImovel={setSelectedImovelGlobal}
+          />
+        );
       case 'leads':
         return (
           <LeadsPage 
@@ -181,6 +226,15 @@ const Index = () => {
               setSelectedLeadGlobal(null);
               setActiveForm('visita');
             }}
+          />
+        )}
+
+        {/* Global Compromisso Detail Sheet */}
+        {selectedCompromissoGlobal && (
+          <CompromissoDetailSheet
+            compromisso={selectedCompromissoGlobal}
+            isOpen={!!selectedCompromissoGlobal}
+            onClose={() => setSelectedCompromissoGlobal(null)}
           />
         )}
 
