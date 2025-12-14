@@ -36,6 +36,7 @@ const Index = () => {
   const [activeForm, setActiveForm] = useState<QuickActionType>(null);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notificacao[]>(initialNotificacoes);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   // Global detail states
   const [selectedImovelGlobal, setSelectedImovelGlobal] = useState<Imovel | null>(null);
@@ -44,6 +45,13 @@ const Index = () => {
   const [isRescheduleOpen, setIsRescheduleOpen] = useState(false);
   const { isFavorito, toggleFavorito } = useFavoritos();
   const { updateCompromisso } = useCompromissos();
+
+  // Reset scroll to top when tab changes
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [activeTab]);
 
   // Convert mock compromisso to hook format for global sheet
   const convertMockCompromisso = (c: MockCompromisso): HookCompromisso => ({
@@ -214,7 +222,7 @@ const Index = () => {
         )}
         
         {/* Scrollable Content with Tab Transition */}
-        <div className="flex-1 overflow-y-auto pb-[100px]">
+        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto pb-[100px]">
           <div 
             key={activeTab}
             className="animate-tab-transition"
